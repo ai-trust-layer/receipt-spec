@@ -1,0 +1,10 @@
+name: Interop Check
+on:
+  pull_request:
+    paths: [ 'schema/**', 'examples/**' ]
+  workflow_dispatch: {}
+jobs:
+  call-interop:
+    uses: ai-trust-layer/receipt-interop-tests/.github/workflows/interop.yml@main
+    with:
+      schema-path: schema/receipt.schema.json
