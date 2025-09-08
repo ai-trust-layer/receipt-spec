@@ -1,16 +1,16 @@
 {
-  "id":"urn:receipt:5555-aaaa",
-  "issued_at":"2025-09-08T12:00:00Z",
+  "id":"urn:receipt:rean-001",
+  "issued_at":"2025-09-08T10:15:00Z",
   "model_version":"vendor:model@2025-09-01",
   "policy_version":"trust:standard@1.0",
   "policy_hash":"sha256:1111111111111111111111111111111111111111111111111111111111111111",
   "input_hash":"sha256:2222222222222222222222222222222222222222222222222222222222222222",
   "output_hash":"sha256:3333333333333333333333333333333333333333333333333333333333333333",
-  "timestamp":"2025-09-08T12:00:03Z",
+  "timestamp":"2025-09-08T10:15:03Z",
   "proof_refs":[
     {"type":"ANCHOR","network":"sepolia","tx":"0xaaa111","finality_level":"soft"},
-    {"type":"RE-ANCHOR","network":"sepolia","tx":"0xbbb222","finality_level":"firm"}
+    {"type":"RE-ANCHOR","network":"sepolia","tx":"0xbbb222","finality_level":"final"}
   ],
   "trustscore":88,
-  "signature":"did:web:example.org#key-1 sig..."
+  "signature":"did:web:example.org#k1 sig..."
 }
