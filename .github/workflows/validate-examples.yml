@@ -1,11 +1,14 @@
 name: Validate examples
-on: [push, pull_request]
+on:
+  pull_request:
+    paths: ['schema/**','examples/**','.github/workflows/validate-examples.yml','scripts/validate-examples.mjs']
+  workflow_dispatch: {}
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: npx -y ajv-cli@5 -c ajv-formats validate -s schema/receipt.schema.json -d "examples/*.json" --spec=draft2020
+        with: { node-version: '20' }
+      - run: npm i ajv@^8 ajv-formats@^3
+      - run: node scripts/validate-examples.mjs
