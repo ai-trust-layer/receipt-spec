@@ -1,13 +1,13 @@
 {
-  "id":"urn:receipt:987f6543",
-  "issued_at":"2025-09-08T11:00:00Z",
+  "id":"urn:receipt:block-001",
+  "issued_at":"2025-09-08T10:10:00Z",
   "model_version":"vendor:model@2025-09-01",
   "policy_version":"trust:strict@1.0",
   "policy_hash":"sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
   "input_hash":"sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
   "output_hash":"sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-  "timestamp":"2025-09-08T11:00:02Z",
-  "proof_refs":[{"type":"ANCHOR","network":"base-sepolia","tx":"0xdef456","finality_level":"soft"}],
+  "timestamp":"2025-09-08T10:10:02Z",
+  "proof_refs":[{"type":"ANCHOR","network":"sepolia","tx":"0xblk001","finality_level":"firm"}],
   "trustscore":0,
-  "signature":"did:web:example.org#key-1 sig..."
+  "signature":"did:web:example.org#k1 sig..."
 }
