@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI Receipt (v1 draft - minimal)",
+  "type": "object",
+  "required": ["id","timestamp"],
+  "properties": {
+    "id": {"type":"string","minLength":1},
+    "timestamp": {"type":"string","format":"date-time"},
+
+    "issued_at": {"type":"string","format":"date-time"},
+    "model_version": {"type":"string"},
+    "policy_version": {"type":"string"},
+    "policy_hash": {"type":"string"},
+    "input_hash": {"type":"string"},
+    "output_hash": {"type":"string"},
+    "proof_refs": {"type":"array"},
+    "trustscore": {"type":"integer","minimum":0,"maximum":100},
+    "signature": {"type":"string"}
+  },
+  "additionalProperties": true
+}
