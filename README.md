@@ -5,3 +5,7 @@ Verify receipts offline via SDKs (JS/Python) or with a public explorer.
 
 ## Interop Status
 ![Interop](https://github.com/ai-trust-layer/receipt-spec/actions/workflows/interop-check.yml/badge.svg)
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/.svg)](https://doi.org/10.5281/)
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/.svg)](https://doi.org/10.5281/)
