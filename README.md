@@ -1,3 +1,7 @@
+![Interop Gate](https://github.com/ai-trust-layer/receipt-spec/actions/workflows/interop.yml/badge.svg)
+
+DOI: https://doi.org/10.5281/zenodo.17079925
+
 # Receipt Standard (v1.0 draft)
 Open, vendor-neutral format for proving AI process integrity per response.
 Each receipt includes: model version, policy version, policy hash, input/output commitments, timestamp, public anchors, TrustScore, and a signature.
