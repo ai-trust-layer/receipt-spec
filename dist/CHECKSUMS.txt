@@ -1,0 +1,1 @@
+bc040647e270068428e8b48de82d8c8475cf609bd6a3e7603b8ad24c0692dbb5  schema/receipt.schema.json
