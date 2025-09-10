@@ -11,3 +11,8 @@
 - TxID (Sepolia): 0x7c45d01fec9474a4d4bcfda72640e501d311eee9afb7d76666b2e8b73b3dd38b
 - DOI: https://doi.org/10.5281/zenodo.17079925
 - Files: receipt-spec-v1.md, schema/receipt.schema.json, examples.tgz
+
+## v1.0.4
+- CHECKSUMS sha256: b0e1c208b099a6a6035440283e4878e99c533a4cc946b413c6dbb9b20aca9904
+- Sepolia TxID: 0xb7fe78b318c160f3a7495b596ef96a9f77a9406e7a59395cdf084274f211cf25
+- DOI: 10.5281/zenodo.17079925
