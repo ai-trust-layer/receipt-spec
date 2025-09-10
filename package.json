@@ -1,0 +1,29 @@
+{
+  "name": "receipt-spec",
+  "version": "1.0.0",
+  "description": "![Interop Gate](https://github.com/ai-trust-layer/receipt-spec/actions/workflows/interop.yml/badge.svg)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai-trust-layer/receipt-spec.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ai-trust-layer/receipt-spec/issues"
+  },
+  "homepage": "https://github.com/ai-trust-layer/receipt-spec#readme",
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  }
+}
