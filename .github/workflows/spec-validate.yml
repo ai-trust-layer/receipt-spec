@@ -4,13 +4,21 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+
 jobs:
   ajv:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm i -g ajv-cli@5 ajv-formats
-      - run: ajv validate -c ajv-formats -s schema/receipt.schema.json -d "examples/*.json"
+      - name: Install AJV CLI + formats
+        run: npm i -g ajv-cli@5 ajv-formats
+      - name: Print versions
+        run: |
+          node -v
+          npm -v
+          ajv --version
+      - name: Validate schema/examples
+        run: ajv validate -c ajv-formats -s schema/receipt.schema.json -d "examples/*.json"
