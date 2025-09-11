@@ -20,5 +20,7 @@
       "anchored_at": "2025-09-11T10:20:00Z"
     }
   ],
-  "trustscore": 90
+  "trustscore": 90,
+  "model_version": "gpt-x-2025-09-01",
+  "policy_version": "policy-v1.0"
 }
