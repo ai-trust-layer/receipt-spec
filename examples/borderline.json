@@ -13,7 +13,7 @@
       "network": "base-sepolia",
       "tx": "0xbrd001",
       "finality_level": "soft",
-      "txid": "0xbrd001"
+      "txid": "0xb56319f0c4564afebd53f4787bf6a37302ff239857c0b22f5a911ba560d265f4"
     }
   ],
   "trustscore": 62,
