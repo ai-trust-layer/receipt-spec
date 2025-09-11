@@ -21,3 +21,8 @@
 - CHECKSUMS sha256: da5d17bf3cccb900c1fa7eeab706692e345bc89bdcfa117883d3aea9567e866c
 - Sepolia TxID: 0xPASTE_TXID_HERE
 - DOI: 10.5281/zenodo.17079925
+
+## v1.0.6
+- Digest (SHA-256 of CHECKSUMS.txt): e3d5537a21460c78c540acfa8c530d486d9c1270bc16627d7583a62d73ae2d85
+- Sepolia TxID: 0x6a70d7a1673af51e5edfdd6e3f1ce91e8e1934bb53e7b7dd25d70ef84e920455
+- Explorer: https://sepolia.etherscan.io/tx/0x6a70d7a1673af51e5edfdd6e3f1ce91e8e1934bb53e7b7dd25d70ef84e920455
