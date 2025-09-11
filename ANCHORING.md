@@ -15,10 +15,8 @@
 ## v1.0.4
 - DOI: 10.5281/zenodo.17079925
 
-## v1.0.5
 - DOI: 10.5281/zenodo.17079925
 
-## v1.0.6
 - Digest (SHA-256 of CHECKSUMS.txt): e3d5537a21460c78c540acfa8c530d486d9c1270bc16627d7583a62d73ae2d85
 - Explorer: https://sepolia.etherscan.io/tx/0x6a70d7a1673af51e5edfdd6e3f1ce91e8e1934bb53e7b7dd25d70ef84e920455
 
@@ -26,3 +24,4 @@
 - SHA256(CHECKSUMS.txt): 3ec4e3b423aea0d5f3ab668c987305f1e2535e8e5ebb5ae5f1472e5acdbef340
 - Ethereum Sepolia Tx: https://sepolia.etherscan.io/tx/0x69d05d76bbe43f296ddf3742fa38f0730be09008525770d7b26003f791eaa0d6
 - Date: 2025-09-11 UTC
+- DOI: 10.5281/zenodo.17079925
