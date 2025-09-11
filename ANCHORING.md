@@ -13,18 +13,13 @@
 - Files: receipt-spec-v1.md, schema/receipt.schema.json, examples.tgz
 
 ## v1.0.4
-- CHECKSUMS sha256: b0e1c208b099a6a6035440283e4878e99c533a4cc946b413c6dbb9b20aca9904
-- Sepolia TxID: 0xb7fe78b318c160f3a7495b596ef96a9f77a9406e7a59395cdf084274f211cf25
 - DOI: 10.5281/zenodo.17079925
 
 ## v1.0.5
-- CHECKSUMS sha256: da5d17bf3cccb900c1fa7eeab706692e345bc89bdcfa117883d3aea9567e866c
-- Sepolia TxID: 0xPASTE_TXID_HERE
 - DOI: 10.5281/zenodo.17079925
 
 ## v1.0.6
 - Digest (SHA-256 of CHECKSUMS.txt): e3d5537a21460c78c540acfa8c530d486d9c1270bc16627d7583a62d73ae2d85
-- Sepolia TxID: 0x6a70d7a1673af51e5edfdd6e3f1ce91e8e1934bb53e7b7dd25d70ef84e920455
 - Explorer: https://sepolia.etherscan.io/tx/0x6a70d7a1673af51e5edfdd6e3f1ce91e8e1934bb53e7b7dd25d70ef84e920455
 
 ## v1.0.5
