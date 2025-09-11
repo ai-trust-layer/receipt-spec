@@ -1,26 +1,24 @@
 {
-  "id": "urn:receipt:rean-001",
-  "issued_at": "2025-09-08T10:15:00Z",
-  "model_version": "vendor:model@2025-09-01",
-  "policy_version": "trust:standard@1.0",
-  "policy_hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
-  "input_hash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
-  "output_hash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
-  "timestamp": "2025-09-08T10:15:03Z",
+  "id": "ex_reanchor",
+  "issued_at": "2025-09-11T10:15:00Z",
+  "output_hash": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
   "proof_refs": [
     {
-      "type": "ANCHOR",
+      "type": "eth_tx",
+      "chain_id": 11155111,
       "network": "sepolia",
-      "tx": "0xaaa111",
-      "finality_level": "soft"
+      "txid": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "url": "https://sepolia.etherscan.io/tx/0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "anchored_at": "2025-09-11T10:16:00Z"
     },
     {
-      "type": "RE-ANCHOR",
+      "type": "eth_tx",
+      "chain_id": 11155111,
       "network": "sepolia",
-      "tx": "0xbbb222",
-      "finality_level": "final"
+      "txid": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "url": "https://sepolia.etherscan.io/tx/0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "anchored_at": "2025-09-11T10:20:00Z"
     }
   ],
-  "trustscore": 88,
-  "signature": "did:web:example.org#k1 sig..."
+  "trustscore": 90
 }
