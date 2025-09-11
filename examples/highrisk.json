@@ -12,7 +12,8 @@
       "type": "ANCHOR",
       "network": "polygon-amoy",
       "tx": "0xhr001",
-      "finality_level": "firm"
+      "finality_level": "firm",
+      "txid": "0xhr001"
     }
   ],
   "trustscore": 77,

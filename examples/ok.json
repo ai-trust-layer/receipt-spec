@@ -12,7 +12,8 @@
       "type": "ANCHOR",
       "network": "sepolia",
       "tx": "0xok001",
-      "finality_level": "firm"
+      "finality_level": "firm",
+      "txid": "0xok001"
     }
   ],
   "trustscore": 95,

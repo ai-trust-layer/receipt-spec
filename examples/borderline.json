@@ -12,7 +12,8 @@
       "type": "ANCHOR",
       "network": "base-sepolia",
       "tx": "0xbrd001",
-      "finality_level": "soft"
+      "finality_level": "soft",
+      "txid": "0xbrd001"
     }
   ],
   "trustscore": 62,
