@@ -19,6 +19,6 @@ jobs:
         run: |
           node -v
           npm -v
-          ajv --version
+          ajv -V
       - name: Validate schema/examples
         run: ajv validate -c ajv-formats -s schema/receipt.schema.json -d "examples/*.json"
