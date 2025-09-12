@@ -3,3 +3,8 @@ tools/anchor/.env
 tools/anchor/.env
 node_modules/
 .env
+
+# local-only
+.DS_Store
+receipt.json
+tools/
