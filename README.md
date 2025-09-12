@@ -15,3 +15,7 @@ Verify receipts offline via SDKs (JS/Python) or with a public explorer.
 [![DOI](https://zenodo.org/badge/DOI/10.5281/.svg)](https://doi.org/10.5281/)
 
 Live Proof Gallery: https://ai-trust-layer.github.io/proof-gallery/
+
+## Live Verify UI
+
+- https://ai-trust-layer.github.io/receipt-spec/docs/verify.html
