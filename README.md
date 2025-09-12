@@ -32,3 +32,7 @@ Live Proof Gallery: https://ai-trust-layer.github.io/proof-gallery/
 
 - sales/PILOT_SOW.md
 - pricing/PRICING.md
+
+## Website
+
+- https://ai-trust-layer.github.io/receipt-spec/
