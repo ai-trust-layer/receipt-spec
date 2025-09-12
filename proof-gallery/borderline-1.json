@@ -1,0 +1,21 @@
+{
+  "id": "urn:receipt:border-001",
+  "issued_at": "2025-09-08T10:05:00Z",
+  "model_version": "vendor:model@2025-09-01",
+  "policy_version": "trust:standard@1.0",
+  "policy_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "input_hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "output_hash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "timestamp": "2025-09-08T10:05:03Z",
+  "proof_refs": [
+    {
+      "type": "ANCHOR",
+      "network": "base-sepolia",
+      "tx": "0xbrd001",
+      "finality_level": "soft",
+      "txid": "0xb56319f0c4564afebd53f4787bf6a37302ff239857c0b22f5a911ba560d265f4"
+    }
+  ],
+  "trustscore": 62,
+  "signature": "did:web:example.org#k1 sig..."
+}
