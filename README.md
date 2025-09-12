@@ -19,3 +19,11 @@ Live Proof Gallery: https://ai-trust-layer.github.io/proof-gallery/
 ## Live Verify UI
 
 - https://ai-trust-layer.github.io/receipt-spec/docs/verify.html
+
+## Security & Compliance Pack
+
+- SECURITY-ROADMAP.md
+- THREAT_MODEL.md
+- compliance/DPA.sample.md
+- compliance/ToS.sample.md
+- compliance/SLA.sample.md
