@@ -27,3 +27,8 @@ Live Proof Gallery: https://ai-trust-layer.github.io/proof-gallery/
 - compliance/DPA.sample.md
 - compliance/ToS.sample.md
 - compliance/SLA.sample.md
+
+## Pilot & Pricing
+
+- sales/PILOT_SOW.md
+- pricing/PRICING.md
