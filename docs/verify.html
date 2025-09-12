@@ -1,1 +1,29 @@
-404: Not Found
+<!doctype html><meta charset="utf-8"><title>Verify Receipt (schema-only)</title>
+<h3>Verify Receipt (schema-only)</h3>
+<input type="file" id="receipt" accept=".json">
+<pre id="out"></pre>
+<script type="module">
+import Ajv from "https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv2020.min.js";
+import addFormats from "https://cdn.jsdelivr.net/npm/ajv-formats@2/dist/ajv-formats.min.js";
+const out = x => document.getElementById('out').textContent = x;
+
+const schema = await (await fetch('../schema/receipt.schema.json',{cache:'no-store'})).json();
+const ajv = new Ajv({allErrors:true, strict:false});
+addFormats(ajv);
+const validate = ajv.compile(schema);
+
+document.getElementById('receipt').addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const text = await file.text();
+  let data;
+  try { data = JSON.parse(text); } catch(e){ out('Invalid JSON'); return; }
+  const ok = validate(data);
+  const res = {
+    pass: ok,
+    schema_ok: ok,
+    schema_errors: ok ? [] : (validate.errors || [])
+  };
+  out(JSON.stringify(res,null,2));
+});
+</script>
