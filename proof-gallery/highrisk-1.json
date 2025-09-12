@@ -1,0 +1,21 @@
+{
+  "id": "urn:receipt:hr-001",
+  "issued_at": "2025-09-08T10:20:00Z",
+  "model_version": "vendor:model@2025-09-01",
+  "policy_version": "trust:regulated@1.0",
+  "policy_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "input_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "output_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "timestamp": "2025-09-08T10:20:04Z",
+  "proof_refs": [
+    {
+      "type": "ANCHOR",
+      "network": "polygon-amoy",
+      "tx": "0xhr001",
+      "finality_level": "firm",
+      "txid": "0x8725a1f51db02e46d6086d0932b98bc21dd979f976e6a360fc9f45e52b039198"
+    }
+  ],
+  "trustscore": 77,
+  "signature": "did:web:example.org#k1 sig..."
+}

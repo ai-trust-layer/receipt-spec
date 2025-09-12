@@ -1,0 +1,30 @@
+{
+  "id": "ex_reanchor",
+  "issued_at": "2025-09-11T10:15:00Z",
+  "output_hash": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "proof_refs": [
+    {
+      "type": "eth_tx",
+      "chain_id": 11155111,
+      "network": "sepolia",
+      "txid": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "url": "https://sepolia.etherscan.io/tx/0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "anchored_at": "2025-09-11T10:16:00Z"
+    },
+    {
+      "type": "eth_tx",
+      "chain_id": 11155111,
+      "network": "sepolia",
+      "txid": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "url": "https://sepolia.etherscan.io/tx/0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "anchored_at": "2025-09-11T10:20:00Z"
+    },
+    {
+      "type": "eth_sepolia_tx",
+      "value": null
+    }
+  ],
+  "trustscore": 90,
+  "model_version": "gpt-x-2025-09-01",
+  "policy_version": "policy-v1.0"
+}
