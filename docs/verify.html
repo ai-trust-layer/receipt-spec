@@ -27,3 +27,52 @@ document.getElementById('receipt').addEventListener('change', async (e) => {
   out(JSON.stringify(res,null,2));
 });
 </script>
+  <hr>
+  <section id="audit-pack">
+    <h3>Audit pack</h3>
+    <p>Încarcă un receipt JSON și descarcă un pachet ZIP cu schema și raportul de verificare.</p>
+    <input type="file" id="auditFile" accept="application/json">
+    <button id="btnAudit" disabled>Download audit pack</button>
+  </section>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <script>
+  (function(){
+    const fileEl = document.getElementById('auditFile');
+    const btn = document.getElementById('btnAudit');
+    let receiptObj = null;
+
+    fileEl?.addEventListener('change', async (e) => {
+      const f = e.target.files?.[0];
+      if(!f){ btn.disabled = true; return; }
+      try{
+        const txt = await f.text();
+        receiptObj = JSON.parse(txt);
+        btn.disabled = false;
+      }catch{
+        alert('Invalid JSON'); btn.disabled = true;
+      }
+    });
+
+    btn?.addEventListener('click', async () => {
+      if(!receiptObj){ return; }
+      const zip = new JSZip();
+      zip.file('receipt.json', JSON.stringify(receiptObj, null, 2));
+      const schemaTxt = await fetch('receipt.schema.json', {cache:'no-store'}).then(r=>r.text());
+      zip.file('receipt.schema.json', schemaTxt);
+      const report = {
+        id: receiptObj.id || null,
+        issued_at: receiptObj.issued_at || null,
+        policy_version: receiptObj.policy_version || null,
+        policy_hash: receiptObj.policy_hash || null,
+        input_hash: receiptObj.input_hash || null,
+        output_hash: receiptObj.output_hash || null,
+        anchors: receiptObj.proof_refs || []
+      };
+      zip.file('verify_report.json', JSON.stringify(report, null, 2));
+      const fnSafe = (receiptObj.id || 'receipt').replace(/[^a-zA-Z0-9._-]/g,'_');
+      const blob = await zip.generateAsync({type:'blob'});
+      saveAs(blob, `audit_${fnSafe}.zip`);
+    });
+  })();
+  </script>
