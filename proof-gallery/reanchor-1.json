@@ -20,8 +20,9 @@
       "anchored_at": "2025-09-11T10:20:00Z"
     },
     {
-      "type": "eth_sepolia_tx",
-      "value": null
+      "type": "eth_tx",
+      "chain_id": 11155111,
+      "txid": "0x69d05d76bbe43f296ddf3742fa38f0730be09008525770d7b26003f791eaa0d6"
     }
   ],
   "trustscore": 90,
