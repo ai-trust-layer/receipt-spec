@@ -23,6 +23,7 @@
 ## v1.0.5
 - SHA256(CHECKSUMS.txt): c351d7891877c7fb2dc5d9e4254515c345715880a48acfae92f88743b42a2608
 - Ethereum Sepolia Tx: https://sepolia.etherscan.io/tx/0x69d05d76bbe43f296ddf3742fa38f0730be09008525770d7b26003f791eaa0d6
+- Ethereum Sepolia Tx: 0x69d05d76bbe43f296ddf3742fa38f0730be09008525770d7b26003f791eaa0d6
 - Date: 2025-09-11 UTC
 - DOI: 10.5281/zenodo.17079925
 - DOI: 10.5281/zenodo.17079925
