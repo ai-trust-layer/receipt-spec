@@ -14,8 +14,8 @@
 </style>
 <!-- Ajv (draft-07) + formats -->
 <!-- JSZip for ZIP creation -->
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="./vendor/ajv-bundle.js"></script>
+  <script src="./vendor/jszip-bundle.js"></script>
 </head>
 <body>
 <h1>Audit Pack (offline)</h1>
@@ -42,37 +42,6 @@ let last = { receiptText:null, schemaText:null, validation:null };
 
 function readFileAsText(f){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsText(f); }); }
 
-async function verifySchema(receiptText, schemaText){
-  const receipt = JSON.parse(receiptText);
-  const schema  = JSON.parse(schemaText);
-  const ajv = new Ajv7({ allErrors:true, strict:false });
-  addAjvFormats(ajv);
-  const validate = ajv.compile(schema);
-  const ok = validate(receipt);
-  return {
-    ok,
-    errors: ok ? [] : (validate.errors||[]),
-    receipt,
-    schema
-  };
-}
-
-function renderValidation(v){
-  const el = document.getElementById('result');
-  const ts = new Date().toISOString();
-  let html = '';
-  if (v.ok) {
-    html += `<p class="ok">Schema validation: PASS</p>`;
-  } else {
-    html += `<p class="fail">Schema validation: FAIL</p>`;
-  }
-  html += `<p><b>Timestamp:</b> ${ts}</p>`;
-  if (!v.ok) {
-    html += `<pre>${JSON.stringify(v.errors, null, 2)}</pre>`;
-  }
-  el.innerHTML = html;
-  return { pass: v.ok, timestamp: ts, errors: v.errors||[] };
-}
 
 async function makeZip(){
   const zip = new JSZip();
@@ -124,16 +93,40 @@ document.getElementById('btnVerify').addEventListener('click', async ()=>{
   const fs = document.getElementById('fSchema').files[0];
   if (!fr || !fs) { alert('Load both Receipt and Schema'); return; }
   last.receiptText = await readFileAsText(fr);
+  window.last = window.last || {};
   last.schemaText  = await readFileAsText(fs);
   const v = await verifySchema(last.receiptText, last.schemaText);
   last.validation = renderValidation(v);
-  document.getElementById('btnZip').disabled = false;
+  window.last = window.last || {};
+  window.last.validation = v;
+  showResultMessage(v);
 });
 
 document.getElementById('btnZip').addEventListener('click', async ()=>{
   if (!last.receiptText || !last.schemaText || !last.validation) { alert('Run Verify first'); return; }
   await makeZip();
 });
-</script>
+  // verdict text + ZIP (corect, în JS)
+  function showResultMessage(result) {
+    const el = document.getElementById('resultMessage') || (() => {
+      const p = document.createElement('p'); p.id = 'resultMessage';
+      p.style.marginTop = '8px'; p.style.fontWeight = '600';
+      document.getElementById('app')?.appendChild(p) || document.body.appendChild(p);
+      return p;
+    })();
+    el.textContent = result.schema_ok ? 'Verdict: PASS (schema_ok=true)'
+                                      : 'Verdict: FAIL (schema_ok=false)';
+    // activează butonul ZIP după verdict
+    const bz = document.getElementById('btnZip'); if (bz) bz.disabled = false;
+  }
+
+
+  // handler pentru butonul ZIP (dacă nu există deja)
+  (function wireZip(){
+    const btn = document.getElementById('btnZip');
+    if (btn && !btn._wired) { btn.addEventListener('click', makeZip); btn._wired = true; }
+  })();
+  </script>
+  <script src="./js/audit-ui.js"></script>
 </body>
 </html>
