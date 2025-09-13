@@ -4,3 +4,4 @@
 3. Click **Verify**.
 - PASS → download **audit pack (.zip)** with `receipt.json`, `schema.json`, `checks.txt`, `links.txt`.
 - Try a tampered sample (e.g. `tampered-1.json`) → FAIL.
+- no-op: branch protection sanity 2025-09-13 18:36:29Z
