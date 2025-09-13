@@ -5,18 +5,11 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'">
 <title>AI Trust Receipt — Audit Pack</title>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<style>
- body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:24px;}
- fieldset{margin:0 0 16px;padding:12px;}
- .row{margin:8px 0;}
- .ok{color:#0a7a0a} .fail{color:#b00020}
- pre{background:#f6f8fa;padding:12px;border-radius:6px;overflow:auto}
- button{padding:8px 12px}
-</style>
 <!-- Ajv (draft-07) + formats -->
 <!-- JSZip for ZIP creation -->
   <script src="./vendor/ajv-bundle.js"></script>
   <script src="./vendor/jszip-bundle.js"></script>
+  <link rel="stylesheet" href="./css/audit.css">
 </head>
 <body>
 <h1>Audit Pack (offline)</h1>
@@ -38,96 +31,7 @@
 
 <div id="result"></div>
 
-<script>
-let last = { receiptText:null, schemaText:null, validation:null };
 
-function readFileAsText(f){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsText(f); }); }
-
-
-async function makeZip(){
-  const zip = new JSZip();
-  zip.file("receipt.json", last.receiptText);
-  zip.file("schema.json",  last.schemaText);
-  zip.file("validation.json", JSON.stringify(last.validation, null, 2));
-  zip.file("README.txt",
-`AI Trust Layer — Audit Pack
-
-Files:
-- receipt.json    → original receipt
-- schema.json     → JSON Schema used
-- validation.json → result of offline schema validation (Ajv7), with timestamp
-
-This pack is generated client-side (offline-first) for reproducible audits.
-`);
-  const r = JSON.parse(last.receiptText);
-  const name = (r.id ? String(r.id).replace(/[^a-zA-Z0-9._-]/g,'_') : 'receipt') + '-audit.zip';
-  const blob = await zip.generateAsync({type:"blob"});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-}
-
-  async function verifySchema(receiptText, schemaText){
-    const data   = JSON.parse(receiptText);
-    const schema = JSON.parse(schemaText);
-    // Ajv7 + addAjvFormats vin din bundle-ul local
-    const ajv = new Ajv7({ allErrors:true, strict:false });
-    addAjvFormats(ajv);
-    const validate = ajv.compile(schema);
-    const ok = validate(data);
-    return {
-      schema_ok: !!ok,
-      errors: ok ? [] : validate.errors || []
-    };
-  }
-
-  function renderValidation(v){
-    console.log("[AUDIT] validation:", v);
-    // poți îmbunătăți UI aici; pentru test returnăm v ca să-l prindem în last.validation
-    return v;
-  }
-document.getElementById('btnVerify').addEventListener('click', async ()=>{
-  const fr = document.getElementById('fReceipt').files[0];
-  const fs = document.getElementById('fSchema').files[0];
-  if (!fr || !fs) { alert('Load both Receipt and Schema'); return; }
-  last.receiptText = await readFileAsText(fr);
-  window.last = window.last || {};
-  last.schemaText  = await readFileAsText(fs);
-  const v = await verifySchema(last.receiptText, last.schemaText);
-  last.validation = renderValidation(v);
-  window.last = window.last || {};
-  window.last.validation = v;
-  showResultMessage(v);
-});
-
-document.getElementById('btnZip').addEventListener('click', async ()=>{
-  if (!last.receiptText || !last.schemaText || !last.validation) { alert('Run Verify first'); return; }
-  await makeZip();
-});
-  // verdict text + ZIP (corect, în JS)
-  function showResultMessage(result) {
-    const el = document.getElementById('resultMessage') || (() => {
-      const p = document.createElement('p'); p.id = 'resultMessage';
-      p.style.marginTop = '8px'; p.style.fontWeight = '600';
-      document.getElementById('app')?.appendChild(p) || document.body.appendChild(p);
-      return p;
-    })();
-    el.textContent = result.schema_ok ? 'Verdict: PASS (schema_ok=true)'
-                                      : 'Verdict: FAIL (schema_ok=false)';
-    // activează butonul ZIP după verdict
-    const bz = document.getElementById('btnZip'); if (bz) bz.disabled = false;
-  }
-
-
-  // handler pentru butonul ZIP (dacă nu există deja)
-  (function wireZip(){
-    const btn = document.getElementById('btnZip');
-    if (btn && !btn._wired) { btn.addEventListener('click', makeZip); btn._wired = true; }
-  })();
-  </script>
   <script src="./js/audit-ui.js"></script>
 </body>
 </html>
