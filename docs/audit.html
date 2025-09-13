@@ -13,8 +13,6 @@
  button{padding:8px 12px}
 </style>
 <!-- Ajv (draft-07) + formats -->
-<script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv7.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ajv-formats/dist/ajv-formats.min.js"></script>
 <!-- JSZip for ZIP creation -->
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="./vendor/ajv-bundle.js"></script>
@@ -48,7 +46,7 @@ async function verifySchema(receiptText, schemaText){
   const receipt = JSON.parse(receiptText);
   const schema  = JSON.parse(schemaText);
   const ajv = new Ajv7({ allErrors:true, strict:false });
-  ajvFormats(ajv);
+  addAjvFormats(ajv);
   const validate = ajv.compile(schema);
   const ok = validate(receipt);
   return {
@@ -102,6 +100,25 @@ This pack is generated client-side (offline-first) for reproducible audits.
   a.remove();
 }
 
+  async function verifySchema(receiptText, schemaText){
+    const data   = JSON.parse(receiptText);
+    const schema = JSON.parse(schemaText);
+    // Ajv7 + addAjvFormats vin din bundle-ul local
+    const ajv = new Ajv7({ allErrors:true, strict:false });
+    addAjvFormats(ajv);
+    const validate = ajv.compile(schema);
+    const ok = validate(data);
+    return {
+      schema_ok: !!ok,
+      errors: ok ? [] : validate.errors || []
+    };
+  }
+
+  function renderValidation(v){
+    console.log("[AUDIT] validation:", v);
+    // poți îmbunătăți UI aici; pentru test returnăm v ca să-l prindem în last.validation
+    return v;
+  }
 document.getElementById('btnVerify').addEventListener('click', async ()=>{
   const fr = document.getElementById('fReceipt').files[0];
   const fs = document.getElementById('fSchema').files[0];
