@@ -8,3 +8,18 @@ node_modules/
 .DS_Store
 receipt.json
 tools/
+
+# local backups
+*.bak
+proof-gallery/*.backup.json
+
+# build artifacts / legacy
+scripts/
+docs/js/verify-ui.mjs
+docs/vendor/jszip-entry.js
+
+# build artifacts / legacy
+scripts/
+docs/js/verify-ui.mjs
+docs/vendor/jszip-entry.js
+docs/css/audit.css
