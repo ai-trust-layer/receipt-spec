@@ -17,3 +17,9 @@ proof-gallery/*.backup.json
 scripts/
 docs/js/verify-ui.mjs
 docs/vendor/jszip-entry.js
+
+# build artifacts / legacy
+scripts/
+docs/js/verify-ui.mjs
+docs/vendor/jszip-entry.js
+docs/css/audit.css
