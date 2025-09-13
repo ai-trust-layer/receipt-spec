@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>AI Trust Receipt — Audit Pack</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+ body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:24px;}
+ fieldset{margin:0 0 16px;padding:12px;}
+ .row{margin:8px 0;}
+ .ok{color:#0a7a0a} .fail{color:#b00020}
+ pre{background:#f6f8fa;padding:12px;border-radius:6px;overflow:auto}
+ button{padding:8px 12px}
+</style>
+<!-- Ajv (draft-07) + formats -->
+<!-- JSZip for ZIP creation -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="./vendor/ajv-bundle.js"></script>
+</head>
+<body>
+<h1>Audit Pack (offline)</h1>
+<p>Load a <code>receipt.json</code> and the <code>receipt.schema.json</code>, validate locally, then download an audit ZIP.</p>
+
+<fieldset>
+  <legend>Inputs</legend>
+  <div class="row">
+    <label>Receipt&nbsp;<input type="file" id="fReceipt" accept=".json,application/json"/></label>
+  </div>
+  <div class="row">
+    <label>Schema&nbsp;&nbsp;<input type="file" id="fSchema" accept=".json,application/json"/></label>
+  </div>
+  <div class="row">
+    <button id="btnVerify">Verify (schema-only)</button>
+    <button id="btnZip" disabled>Download audit pack (.zip)</button>
+  </div>
+</fieldset>
+
+<div id="result"></div>
+
+<script>
+let last = { receiptText:null, schemaText:null, validation:null };
+
+function readFileAsText(f){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsText(f); }); }
+
+async function verifySchema(receiptText, schemaText){
+  const receipt = JSON.parse(receiptText);
+  const schema  = JSON.parse(schemaText);
+  const ajv = new Ajv7({ allErrors:true, strict:false });
+  addAjvFormats(ajv);
+  const validate = ajv.compile(schema);
+  const ok = validate(receipt);
+  return {
+    ok,
+    errors: ok ? [] : (validate.errors||[]),
+    receipt,
+    schema
+  };
+}
+
+function renderValidation(v){
+  const el = document.getElementById('result');
+  const ts = new Date().toISOString();
+  let html = '';
+  if (v.ok) {
+    html += `<p class="ok">Schema validation: PASS</p>`;
+  } else {
+    html += `<p class="fail">Schema validation: FAIL</p>`;
+  }
+  html += `<p><b>Timestamp:</b> ${ts}</p>`;
+  if (!v.ok) {
+    html += `<pre>${JSON.stringify(v.errors, null, 2)}</pre>`;
+  }
+  el.innerHTML = html;
+  return { pass: v.ok, timestamp: ts, errors: v.errors||[] };
+}
+
+async function makeZip(){
+  const zip = new JSZip();
+  zip.file("receipt.json", last.receiptText);
+  zip.file("schema.json",  last.schemaText);
+  zip.file("validation.json", JSON.stringify(last.validation, null, 2));
+  zip.file("README.txt",
+`AI Trust Layer — Audit Pack
+
+Files:
+- receipt.json    → original receipt
+- schema.json     → JSON Schema used
+- validation.json → result of offline schema validation (Ajv7), with timestamp
+
+This pack is generated client-side (offline-first) for reproducible audits.
+`);
+  const r = JSON.parse(last.receiptText);
+  const name = (r.id ? String(r.id).replace(/[^a-zA-Z0-9._-]/g,'_') : 'receipt') + '-audit.zip';
+  const blob = await zip.generateAsync({type:"blob"});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+  async function verifySchema(receiptText, schemaText){
+    const data   = JSON.parse(receiptText);
+    const schema = JSON.parse(schemaText);
+    // Ajv7 + addAjvFormats vin din bundle-ul local
+    const ajv = new Ajv7({ allErrors:true, strict:false });
+    addAjvFormats(ajv);
+    const validate = ajv.compile(schema);
+    const ok = validate(data);
+    return {
+      schema_ok: !!ok,
+      errors: ok ? [] : validate.errors || []
+    };
+  }
+
+  function renderValidation(v){
+    console.log("[AUDIT] validation:", v);
+    // poți îmbunătăți UI aici; pentru test returnăm v ca să-l prindem în last.validation
+    return v;
+  }
+document.getElementById('btnVerify').addEventListener('click', async ()=>{
+  const fr = document.getElementById('fReceipt').files[0];
+  const fs = document.getElementById('fSchema').files[0];
+  if (!fr || !fs) { alert('Load both Receipt and Schema'); return; }
+  last.receiptText = await readFileAsText(fr);
+  last.schemaText  = await readFileAsText(fs);
+  const v = await verifySchema(last.receiptText, last.schemaText);
+  last.validation = renderValidation(v);
+  document.getElementById('btnZip').disabled = false;
+});
+
+document.getElementById('btnZip').addEventListener('click', async ()=>{
+  if (!last.receiptText || !last.schemaText || !last.validation) { alert('Run Verify first'); return; }
+  await makeZip();
+});
+</script>
+</body>
+</html>
