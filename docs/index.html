@@ -1,18 +1,42 @@
-<!doctype html><html lang="en"><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Trust Layer — Verifiable AI Assurance</title>
-<style>
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;padding:40px;line-height:1.5}
-h1{font-size:2rem;margin:0 0 8px} p{max-width:720px}
-.ctas a{display:inline-block;margin:8px 8px 0 0;padding:10px 14px;border:1px solid #111;text-decoration:none}
-.small{color:#666;font-size:.9rem;margin-top:24px}
-</style>
-<h1>Verifiable AI Assurance</h1>
-<p>Turn AI outputs into <b>evidence</b>: receipts you can verify offline, anchor on-chain, and present in audits.</p>
-<div class="ctas">
-  <a href="docs/verify.html">Verify a receipt</a>
-  <a href="https://github.com/ai-trust-layer/receipt-spec/tree/main/proof-gallery" target="_blank" rel="noopener">Proof Gallery</a>
-  <a href="https://github.com/ai-trust-layer/receipt-spec/issues/new?template=pilot_request.md" target="_blank" rel="noopener">Apply for pilot</a>
-  <a href="blog/2025-09-12-receipt-v1.0.html">Announcement</a>
-</div>
-<p class="small">Spec v1.0 · DOI: 10.5281/zenodo.17079925 · Sepolia Tx: 0x69d05d76bbe43f296ddf3742fa38f0730be09008525770d7b26003f791eaa0d6</p>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AI Trust Layer — Receipts</title>
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; object-src 'none'; base-uri 'self'; style-src 'self'; script-src 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; }
+    h1 { margin: 0 0 8px 0; }
+    .grid { display: grid; gap: 12px; max-width: 640px; }
+    a.card { display: block; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: inherit; }
+    a.card:hover { border-color: #bbb; background: #fafafa; }
+    small { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>AI Trust Layer — Verifiable Receipts</h1>
+  <p><small>Offline-first, fără CDN. Pentru Ajv pe pagina Verify/Audit, CSP e ajustată local acolo.</small></p>
+
+  <div class="grid">
+    <a class="card" href="./verify.html">
+      <strong>Verify (schema-only)</strong><br>
+      <small>Încarci un receipt + schema → verdict de schemă (PASS/FAIL)</small>
+    </a>
+    <a class="card" href="./audit.html">
+      <strong>Audit Pack</strong><br>
+      <small>Verify + descarci .zip (receipt, schema, checks, links)</small>
+    </a>
+    <a class="card" href="./README.md">
+      <strong>How to verify (60s)</strong><br>
+      <small>Pașii rapizi pentru demo</small>
+    </a>
+    <a class="card" href="../">
+      <strong>Repository root</strong><br>
+      <small>Înapoi la listarea directorului</small>
+    </a>
+  </div>
+</body>
+</html>
