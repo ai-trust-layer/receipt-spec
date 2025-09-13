@@ -6,16 +6,42 @@ on:
       - 'examples/**'
       - 'proof-gallery/**'
       - 'schema/**'
+
 jobs:
-  ajv:
+  ajv-valid:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: npm i -g ajv-cli@5 ajv-formats
-      - run: ajv validate -c ajv-formats -s docs/receipt.schema.json -d "examples/*.json"
-      - run: ajv validate -c ajv-formats -s docs/receipt.schema.json -d "proof-gallery/*.json"
+      - name: Validate expected-valid receipts
+        run: |
+          ajv validate -c ajv-formats -s docs/receipt.schema.json \
+            -d "examples/*.json" \
+            -d "proof-gallery/ok-*.json" \
+            -d "proof-gallery/tampered-*.json" \
+            -d "proof-gallery/borderline-*.json" \
+            -d "proof-gallery/highrisk-*.json" \
+            -d "proof-gallery/reanchor-*.json" \
+            -d "proof-gallery/blocked-*.json"
+
+  ajv-invalid:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm i -g ajv-cli@5 ajv-formats
+      - name: Validate expected-invalid receipts (must fail)
+        run: |
+          set -e
+          # Comanda trebuie să EȘUEZE pentru fișierele marcate invalid
+          if ajv validate -c ajv-formats -s docs/receipt.schema.json -d "proof-gallery/*invalid*.json"; then
+            echo "Expected invalid receipts to fail schema validation"; exit 1
+          fi
+
   no-cdn:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: "! grep -RniE 'jsdelivr|unpkg|cdn' docs || (echo 'CDN refs found' && exit 1)"
+      - name: Ensure no external CDN domains are referenced
+        run: |
+          # Căutăm DOAR domenii CDN în URL-uri, nu cuvântul „CDN” din text.
+          ! grep -RniE "https?://[^\"']*(jsdelivr|unpkg|cdnjs|ajax\.googleapis\.com|fonts\.googleapis\.com|cdn\.[^/\"']+)" docs || { echo 'CDN refs found'; exit 1; }
