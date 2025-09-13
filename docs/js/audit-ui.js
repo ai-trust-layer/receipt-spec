@@ -47,3 +47,46 @@ async function makeZip() {
     btn._wired = true;
   }
 })();
+
+// --- bootstrap: robust Verify wiring (schema-only) ---
+(function(){
+  const boot = () => {
+    const btn = document.getElementById('btnVerify');
+    const fr  = document.getElementById('fReceipt');
+    const fs  = document.getElementById('fSchema');
+    const out = document.getElementById('resultMessage');
+    if (!btn || !fr || !fs || !out) return;
+
+    btn.addEventListener('click', async () => {
+      try {
+        if (!(fr.files && fr.files[0] && fs.files && fs.files[0])) {
+          out.textContent = 'Select both files first.'; return;
+        }
+        const [rt, st] = await Promise.all([fr.files[0].text(), fs.files[0].text()]);
+        const data   = JSON.parse(rt);
+        const schema = JSON.parse(st);
+
+        const ajv = new window.Ajv7({ allErrors:true, strict:false });
+        if (typeof window.addAjvFormats === 'function') window.addAjvFormats(ajv);
+
+        const validate = ajv.compile(schema);
+        const ok = validate(data);
+        window.last = window.last || {};
+        window.last.validation = { schema_ok: ok, errors: validate.errors || [] };
+        window.last.receiptText = rt;
+        window.last.schemaText = st;
+        out.textContent = ok ? 'Verdict: PASS (schema_ok=true)' : 'Verdict: FAIL (schema_ok=false)';
+
+        const bz = document.getElementById('btnZip'); if (bz) bz.disabled = false;
+      } catch (e) {
+        console.error('verify error:', e);
+        out.textContent = 'Verdict: FAIL (unexpected_error)';
+      }
+    });
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
