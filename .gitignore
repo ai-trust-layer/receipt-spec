@@ -12,3 +12,8 @@ tools/
 # local backups
 *.bak
 proof-gallery/*.backup.json
+
+# build artifacts / legacy
+scripts/
+docs/js/verify-ui.mjs
+docs/vendor/jszip-entry.js
