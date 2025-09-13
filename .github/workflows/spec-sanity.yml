@@ -1,0 +1,17 @@
+name: Spec Sanity
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'examples/**'
+      - 'proof-gallery/**'
+      - 'schema/**'
+jobs:
+  ajv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: npm i -g ajv-cli@5 ajv-formats
+      - run: ajv validate -c ajv-formats -s docs/receipt.schema.json -d "examples/*.json"
+      - run: ajv validate -c ajv-formats -s docs/receipt.schema.json -d "proof-gallery/*.json"

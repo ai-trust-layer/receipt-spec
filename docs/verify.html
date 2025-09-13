@@ -3,13 +3,11 @@
 <input type="file" id="receipt" accept=".json">
 <pre id="out"></pre>
 <script type="module">
-import Ajv from "https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv2020.min.js";
-import addFormats from "https://cdn.jsdelivr.net/npm/ajv-formats@2/dist/ajv-formats.min.js";
 const out = x => document.getElementById('out').textContent = x;
 
 const schema = await (await fetch('../schema/receipt.schema.json',{cache:'no-store'})).json();
-const ajv = new Ajv({allErrors:true, strict:false});
-addFormats(ajv);
+const ajv = new Ajv7({allErrors:true, strict:false});
+addAjvFormats(ajv);
 const validate = ajv.compile(schema);
 
 document.getElementById('receipt').addEventListener('change', async (e) => {
@@ -34,8 +32,6 @@ document.getElementById('receipt').addEventListener('change', async (e) => {
     <input type="file" id="auditFile" accept="application/json">
     <button id="btnAudit" disabled>Download audit pack</button>
   </section>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   <script>
   (function(){
     const fileEl = document.getElementById('auditFile');
