@@ -10,17 +10,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Build SDK
+
+      - name: Probe for local CLI
+        id: probe
         run: |
-          echo "Assuming receipt-sdk-js is in org; falling back to local CLI if present."
           if [ -f receipt-sdk-js/bin/receipt-verify ]; then
-            echo "Local CLI found."
+            echo "found=true" >> "$GITHUB_OUTPUT"
           else
-            echo "No local SDK; installing from repo path not configured. Skipping CLI run."
-            exit 0
+            echo "found=false" >> "$GITHUB_OUTPUT"
           fi
+
       - name: Run CLI on examples (schema-only)
-        if: ${{ hashFiles('docs/schema/receipt.schema.json') != '' }}
+        if: steps.probe.outputs.found == 'true'
         run: |
           SCHEMA="docs/schema/receipt.schema.json"
           CLI="node receipt-sdk-js/bin/receipt-verify verify"
@@ -35,3 +36,7 @@ jobs:
           done
           echo "PASS=$PASS FAIL=$FAIL"
           if [ $FAIL -gt 0 ]; then exit 1; fi
+
+      - name: CLI not present — skip gracefully
+        if: steps.probe.outputs.found != 'true'
+        run: echo "No local SDK CLI found; skipping CLI run."
