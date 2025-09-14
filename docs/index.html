@@ -1,42 +1,40 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>AI Trust Layer — Receipts</title>
-  <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; object-src 'none'; base-uri 'self'; style-src 'self'; script-src 'self'">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="data:,">
-  <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; }
-    h1 { margin: 0 0 8px 0; }
-    .grid { display: grid; gap: 12px; max-width: 640px; }
-    a.card { display: block; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: inherit; }
-    a.card:hover { border-color: #bbb; background: #fafafa; }
-    small { color: #666; }
-  </style>
-</head>
-<body>
-  <h1>AI Trust Layer — Verifiable Receipts</h1>
-  <p><small>Offline-first, fără CDN. Pentru Ajv pe pagina Verify/Audit, CSP e ajustată local acolo.</small></p>
+<html lang="ro">
+  <head>
+    <meta charset="utf-8" />
+    <title>AI Trust Layer — Receipts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'self'; style-src 'self'; script-src 'self' 'unsafe-eval'; frame-ancestors 'none'">
+  </head>
+  <body>
+    <header>
+      <h1>AI Trust Layer — Verifiable Receipts</h1>
+      <p>Demo static, offline-first. Alege una din paginile de mai jos.</p>
+    </header>
 
-  <div class="grid">
-    <a class="card" href="./verify.html">
-      <strong>Verify (schema-only)</strong><br>
-      <small>Încarci un receipt + schema → verdict de schemă (PASS/FAIL)</small>
-    </a>
-    <a class="card" href="./audit.html">
-      <strong>Audit Pack</strong><br>
-      <small>Verify + descarci .zip (receipt, schema, checks, links)</small>
-    </a>
-    <a class="card" href="./README.md">
-      <strong>How to verify (60s)</strong><br>
-      <small>Pașii rapizi pentru demo</small>
-    </a>
-    <a class="card" href="../">
-      <strong>Repository root</strong><br>
-      <small>Înapoi la listarea directorului</small>
-    </a>
-  </div>
-</body>
+    <main>
+      <nav aria-label="Navigație principală">
+        <ul>
+          <li><a href="verify.html">Verify (schema-only)</a></li>
+          <li><a href="audit.html">Audit (ZIP cu checks)</a></li>
+          <li><a href="proof-gallery/">Proof Gallery</a></li>
+          <li><a href="README.md">README</a></li>
+          <li><a href="ANCHORING.md">ANCHORING</a></li>
+        </ul>
+      </nav>
+
+      <section>
+        <h2>Ce face fiecare:</h2>
+        <ul>
+          <li><strong>Verify</strong>: validează JSON-ul de receipt față de schemă și afișează verdictul.</li>
+          <li><strong>Audit</strong>: validează și poate descărca <em>audit pack</em> (.zip) cu <code>schema_ok</code>, <code>hashes_ok</code>, timestamp.</li>
+          <li><strong>Proof Gallery</strong>: exemple OK/TAMPERED pentru demo.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>
+      <small>&copy; AI Trust Layer — build local, fără CDN</small>
+    </footer>
+  </body>
 </html>
