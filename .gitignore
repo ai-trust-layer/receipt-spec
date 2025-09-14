@@ -23,3 +23,6 @@ scripts/
 docs/js/verify-ui.mjs
 docs/vendor/jszip-entry.js
 docs/css/audit.css
+
+# local backups
+*.bak*
