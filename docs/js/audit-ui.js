@@ -253,3 +253,61 @@ async function makeZip() {
   // after any successful verify elsewhere in this file, enable ZIP
   document.addEventListener('atl:verify:done', () => { if (bz) bz.disabled = false; });
 })();
+
+// --- hashes_ok patch (appended safely) ---
+(function(){
+  async function sha256Hex(str){
+    const enc = new TextEncoder().encode(str ?? "");
+    const buf = await crypto.subtle.digest("SHA-256", enc);
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+  }
+  function extractExpect(receipt){
+    const raw = (receipt && receipt.output_hash) ? String(receipt.output_hash) : "";
+    const m = raw.replace(/^sha256:/i,"").trim().toLowerCase();
+    return m.length===64 ? m : "";
+  }
+  async function computeHashesOk(receipt){
+    try{
+      const expect = extractExpect(receipt);
+      if(!expect) return "unknown";
+      const out = (typeof receipt.output === "string") ? receipt.output : JSON.stringify(receipt.output ?? "");
+      const calc = (await sha256Hex(out)).toLowerCase();
+      return (calc === expect);
+    }catch(e){ return false; }
+  }
+
+  const orig = window.manualValidate;
+  if(typeof orig === "function"){
+    window.manualValidate = async function(){
+      const res = await orig.apply(this, arguments);
+      try{
+        // calc hashes_ok and update verdict text + window.last.validation
+        const fr = document.getElementById('fReceipt');
+        const rTxt = await (fr?.files?.[0]?.text?.() ?? Promise.resolve("{}"));
+        const data = JSON.parse(rTxt);
+
+        const hashes_ok = await computeHashesOk(data);
+
+        // update verdict line if present
+        const el = document.getElementById('resultMessage') || document.getElementById('result');
+        if(el && typeof el.textContent === 'string'){
+          if(!/hashes_ok:/i.test(el.textContent)){
+            el.textContent = el.textContent + "  |  hashes_ok: " + String(hashes_ok);
+          }else{
+            el.textContent = el.textContent.replace(/hashes_ok:\s*\S+/i, "hashes_ok: " + String(hashes_ok));
+          }
+        }
+
+        // persist for ZIP
+        window.last = window.last || {};
+        window.last.validation = Object.assign(
+          { schema_ok: null, errors: [] }, // defaults
+          window.last.validation || {},
+          { hashes_ok: hashes_ok }
+        );
+      }catch(_e){}
+      return res;
+    };
+  }
+})();
+
