@@ -1,3 +1,11 @@
+// Minimal SHA-256 hex helper
+async function sha256Hex(str) {
+  const enc = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return Array.from(new Uint8Array(buf))
+    .map(b => b.toString(16).padStart(2,"0"))
+    .join("");
+}
 // verdict în UI
 function showResultMessage(result) {
   const host = document.getElementById('app') || document.body;
@@ -10,6 +18,7 @@ function showResultMessage(result) {
     host.appendChild(el);
   }
   el.textContent = result.schema_ok ? 'Verdict: PASS (schema_ok=true)' : 'Verdict: FAIL (schema_ok=false)';
+  if ("hashes_ok" in result) el.textContent += `  |  hashes_ok: ${result.hashes_ok}`;
   const bz = document.getElementById('btnZip'); if (bz) bz.disabled = false;
 }
 
@@ -18,10 +27,13 @@ async function makeZip() {
   const zip = new JSZip();
   zip.file('receipt.json', window.last?.receiptText ?? '');
   zip.file('schema.json',  window.last?.schemaText ?? '');
-  const checks = [
-    `schema_ok=${window.last?.validation?.schema_ok ?? 'unknown'}`,
-    `timestamp=${new Date().toISOString()}`
-  ].join('\n');
+  const checksLines = [];
+  checksLines.push(`schema_ok: ${window.last?.validation?.schema_ok ?? 'unknown'}`);
+  if (typeof window.last?.validation?.hashes_ok !== 'undefined') {
+    checksLines.push(`hashes_ok: ${window.last.validation.hashes_ok}`);
+  }
+  checksLines.push(`timestamp: ${new Date().toISOString()}`);
+  const checks = checksLines.join('\n');
   zip.file('checks.txt', checks);
   const links = [
     window.last?.validation?.tx_url  ? `Tx: ${window.last.validation.tx_url}`   : '',
@@ -64,6 +76,20 @@ async function makeZip() {
         }
         const [rt, st] = await Promise.all([fr.files[0].text(), fs.files[0].text()]);
         const data   = JSON.parse(rt);
+        // --- minimal hashes check (local-only) ---
+        let hashes_ok = 'unknown';
+        try {
+          const rawHash = data && typeof data === 'object' ? data.output_hash : undefined;
+          // normalize forms like "sha256:<hex>" or plain hex
+          const expect = rawHash ? String(rawHash).replace(/^sha256:/i, '').toLowerCase() : undefined;
+          if (expect && data && typeof data.output === 'string') {
+            const calc = (await sha256Hex(data.output)).toLowerCase();
+            hashes_ok = (calc === expect);
+          }
+          // if `output` is missing, keep 'unknown'
+        } catch (_e) {
+          hashes_ok = false; // fail-safe on unexpected error
+        }
         const schema = JSON.parse(st);
 
         const ajv = new window.Ajv7({ allErrors:true, strict:false });
@@ -72,10 +98,15 @@ async function makeZip() {
         const validate = ajv.compile(schema);
         const ok = validate(data);
         window.last = window.last || {};
-        window.last.validation = { schema_ok: ok, errors: validate.errors || [] };
+        window.last.validation = {
+          schema_ok: ok,
+          hashes_ok: hashes_ok,
+          errors: validate.errors || []
+        };
         window.last.receiptText = rt;
         window.last.schemaText = st;
         out.textContent = ok ? 'Verdict: PASS (schema_ok=true)' : 'Verdict: FAIL (schema_ok=false)';
+        out.textContent += `  |  hashes_ok: ${hashes_ok}`;
 
         const bz = document.getElementById('btnZip'); if (bz) bz.disabled = false;
       } catch (e) {
