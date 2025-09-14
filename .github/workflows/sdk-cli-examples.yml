@@ -1,0 +1,37 @@
+name: SDK JS CLI on examples
+on:
+  pull_request:
+    branches: [ main ]
+jobs:
+  cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build SDK
+        run: |
+          echo "Assuming receipt-sdk-js is in org; falling back to local CLI if present."
+          if [ -f receipt-sdk-js/bin/receipt-verify ]; then
+            echo "Local CLI found."
+          else
+            echo "No local SDK; installing from repo path not configured. Skipping CLI run."
+            exit 0
+          fi
+      - name: Run CLI on examples (schema-only)
+        if: ${{ hashFiles('docs/schema/receipt.schema.json') != '' }}
+        run: |
+          SCHEMA="docs/schema/receipt.schema.json"
+          CLI="node receipt-sdk-js/bin/receipt-verify verify"
+          PASS=0; FAIL=0
+          for f in docs/examples/*.json; do
+            echo "== $f =="
+            set +e
+            $CLI "$f" --schema "$SCHEMA" --schema-only
+            RC=$?
+            set -e
+            if [ $RC -eq 0 ]; then PASS=$((PASS+1)); else FAIL=$((FAIL+1)); fi
+          done
+          echo "PASS=$PASS FAIL=$FAIL"
+          if [ $FAIL -gt 0 ]; then exit 1; fi
