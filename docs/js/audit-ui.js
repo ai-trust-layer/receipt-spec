@@ -6,6 +6,74 @@ async function sha256Hex(str) {
     .map(b => b.toString(16).padStart(2,"0"))
     .join("");
 }
+
+// Ed25519 signature verification helpers
+function b64uToBytes(s) {
+  // Convert base64url to base64, then decode
+  const base64 = s.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = base64 + '='.repeat((4 - base64.length % 4) % 4);
+  return new Uint8Array(atob(padded).split('').map(c => c.charCodeAt(0)));
+}
+
+function hexToBytes(s) {
+  const bytes = new Uint8Array(s.length / 2);
+  for (let i = 0; i < s.length; i += 2) {
+    bytes[i / 2] = parseInt(s.substr(i, 2), 16);
+  }
+  return bytes;
+}
+
+function textToBytes(s) {
+  return new TextEncoder().encode(s);
+}
+
+function canonicalSubset(obj, keys) {
+  const subset = {};
+  for (const key of keys) {
+    if (obj[key] !== undefined) {
+      subset[key] = obj[key];
+    }
+  }
+  return JSON.stringify(subset);
+}
+
+function detectFmt(s) {
+  // Check if it's base64url (no padding, contains - or _)
+  if (/^[A-Za-z0-9_-]+$/.test(s) && (s.includes('-') || s.includes('_'))) {
+    return "b64u";
+  }
+  // Check if it's hex (only 0-9, a-f, A-F)
+  if (/^[0-9a-fA-F]+$/.test(s)) {
+    return "hex";
+  }
+  return null;
+}
+
+async function verifyEd25519(pubBytes, sigBytes, msgBytes) {
+  try {
+    // Check if Ed25519 is supported
+    if (!crypto.subtle || !crypto.subtle.importKey) {
+      return null; // unknown
+    }
+    
+    const key = await crypto.subtle.importKey(
+      "raw",
+      pubBytes,
+      { name: "Ed25519" },
+      true,
+      ["verify"]
+    );
+    
+    return await crypto.subtle.verify(
+      { name: "Ed25519" },
+      key,
+      sigBytes,
+      msgBytes
+    );
+  } catch (e) {
+    return null; // unknown (Ed25519 not supported or other error)
+  }
+}
 // verdict în UI
 function showResultMessage(result) {
   const host = document.getElementById('app') || document.body;
@@ -19,6 +87,7 @@ function showResultMessage(result) {
   }
   el.textContent = result.schema_ok ? 'Verdict: PASS (schema_ok=true)' : 'Verdict: FAIL (schema_ok=false)';
   if ("hashes_ok" in result) el.textContent += `  |  hashes_ok: ${result.hashes_ok}`;
+  if ("signature_ok" in result) el.textContent += `  |  signature_ok: ${result.signature_ok}`;
   const bz = document.getElementById('btnZip'); if (bz) bz.disabled = false;
 }
 
@@ -27,13 +96,12 @@ async function makeZip() {
   const zip = new JSZip();
   zip.file('receipt.json', window.last?.receiptText ?? '');
   zip.file('schema.json',  window.last?.schemaText ?? '');
-  const checksLines = [];
-  checksLines.push(`schema_ok: ${window.last?.validation?.schema_ok ?? 'unknown'}`);
-  if (typeof window.last?.validation?.hashes_ok !== 'undefined') {
-    checksLines.push(`hashes_ok: ${window.last.validation.hashes_ok}`);
-  }
-  checksLines.push(`timestamp: ${new Date().toISOString()}`);
-  const checks = checksLines.join('\n');
+  const checks = [
+    `schema_ok: ${window.last?.validation?.schema_ok ?? false}`,
+    `hashes_ok: ${window.last?.validation?.hashes_ok ?? 'unknown'}`,
+    `signature_ok: ${window.last?.validation?.signature_ok ?? 'unknown'}`,
+    `timestamp: ${new Date().toISOString()}`
+  ].join('\n');
   zip.file('checks.txt', checks);
   const links = [
     window.last?.validation?.tx_url  ? `Tx: ${window.last.validation.tx_url}`   : '',
@@ -91,6 +159,36 @@ async function makeZip() {
         } catch (_e) {
           hashes_ok = false; // fail-safe on unexpected error
         }
+        
+        // --- Ed25519 signature check ---
+        let signature_ok = 'unknown';
+        try {
+          const sig = data && typeof data === 'object' ? data.signature : undefined;
+          if (sig && typeof sig === 'object' && sig.alg === 'Ed25519' && sig.value && sig.key) {
+            // Decode public key and signature
+            const keyFmt = detectFmt(sig.key);
+            const sigFmt = detectFmt(sig.value);
+            if (keyFmt && sigFmt) {
+              const pubBytes = keyFmt === 'b64u' ? b64uToBytes(sig.key) : hexToBytes(sig.key);
+              const sigBytes = sigFmt === 'b64u' ? b64uToBytes(sig.value) : hexToBytes(sig.value);
+              
+              // Build canonical payload
+              const payloadStr = canonicalSubset(data, ['id', 'issued_at', 'model_version', 'policy_version', 'input_hash', 'output_hash', 'timestamp']);
+              const msgBytes = textToBytes(payloadStr);
+              
+              // Verify signature
+              const result = await verifyEd25519(pubBytes, sigBytes, msgBytes);
+              if (result !== null) {
+                signature_ok = result;
+              }
+              // if result is null, keep 'unknown'
+            }
+            // if decode fails, keep 'unknown'
+          }
+          // if signature missing or malformed, keep 'unknown'
+        } catch (_e) {
+          signature_ok = false; // fail-safe on unexpected error
+        }
         const schema = JSON.parse(st);
 
         const ajv = new window.Ajv7({ allErrors:true, strict:false });
@@ -102,12 +200,14 @@ async function makeZip() {
         window.last.validation = {
           schema_ok: ok,
           hashes_ok: hashes_ok,
+          signature_ok: signature_ok,
           errors: validate.errors || []
         };
         window.last.receiptText = rt;
         window.last.schemaText = st;
         out.textContent = ok ? 'Verdict: PASS (schema_ok=true)' : 'Verdict: FAIL (schema_ok=false)';
         out.textContent += `  |  hashes_ok: ${hashes_ok}`;
+        out.textContent += `  |  signature_ok: ${signature_ok}`;
 
         const bz = document.getElementById('btnZip'); if (bz) bz.disabled = false;
       } catch (e) {
