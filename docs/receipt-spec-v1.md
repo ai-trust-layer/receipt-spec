@@ -1,0 +1,6 @@
+- id: string (uuid or ulid)
+- issued_at: string (ISO-8601)
+- output: string
+- output_hash: string (format: "sha256:<hex>")
+- JSON Schema: docs/schema/receipt.schema.json
+- hashes_ok: sha256(output) equals output_hash (hex, case-insensitive)
