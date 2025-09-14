@@ -1,0 +1,8 @@
+{
+  "name": "@atl/receipt-sdk-js",
+  "version": "0.0.1",
+  "type": "module",
+  "bin": { "receipt-verify": "bin/cli.js" },
+  "scripts": { "test": "node --test" },
+  "dependencies": { "ajv": "^8.17.1" }
+}
