@@ -311,3 +311,96 @@ async function makeZip() {
   }
 })();
 
+// --- signature_ok (Ed25519 via WebCrypto) ---
+(function(){
+  function b64uToBytes(s){
+    const t = s.replace(/-/g,'+').replace(/_/g,'/');
+    const pad = '==='.slice((t.length+3)%4);
+    const bin = atob(t+pad);
+    return Uint8Array.from(bin, c=>c.charCodeAt(0));
+  }
+  function hexToBytes(h){
+    const m = (h||'').trim();
+    if(!/^[0-9a-fA-F]+$/.test(m) || (m.length%2)) return null;
+    const out = new Uint8Array(m.length/2);
+    for(let i=0;i<out.length;i++) out[i]=parseInt(m.slice(i*2,i*2+2),16);
+    return out;
+  }
+  function textBytes(s){ return new TextEncoder().encode(String(s??'')); }
+  function canonicalSubset(obj, keys){
+    const o={}; for(const k of keys){ if(obj&&obj[k]!==undefined) o[k]=obj[k]; }
+    return JSON.stringify(o);
+  }
+  function detectFmt(s){
+    if(typeof s!=='string') return null;
+    if(/^[A-Za-z0-9_-]+$/.test(s)) return 'b64u';
+    if(/^[0-9a-fA-F]+$/.test(s)) return 'hex';
+    return null;
+    }
+  async function verifyEd25519(pubBytes, sigBytes, msgBytes){
+    if(!(crypto.subtle && crypto.subtle.importKey)) return null;
+    try{
+      const key = await crypto.subtle.importKey(
+        'raw', pubBytes, {name:'Ed25519'}, false, ['verify']
+      );
+      const ok = await crypto.subtle.verify({name:'Ed25519'}, key, sigBytes, msgBytes);
+      return !!ok;
+    }catch(_e){ return null; }
+  }
+
+  const original = window.manualValidate;
+  if(typeof original === 'function'){
+    window.manualValidate = async function(){
+      const res = await original.apply(this, arguments);
+      try{
+        // citim receipt-ul selectat
+        const fr = document.getElementById('fReceipt');
+        const rTxt = await (fr?.files?.[0]?.text?.() ?? Promise.resolve('{}'));
+        const receipt = JSON.parse(rTxt||'{}');
+
+        // extragem semnătura
+        let signature_ok = 'unknown';
+        const sig = receipt && receipt.signature;
+        if(sig && (sig.alg==='Ed25519' || sig.alg==='ed25519') && sig.value && sig.key){
+          const vFmt = detectFmt(sig.value);
+          const kFmt = detectFmt(sig.key);
+          let sigBytes=null, pubBytes=null;
+          if(vFmt==='b64u') sigBytes=b64uToBytes(sig.value);
+          if(vFmt==='hex')  sigBytes=hexToBytes(sig.value);
+          if(kFmt==='b64u') pubBytes=b64uToBytes(sig.key);
+          if(kFmt==='hex')  pubBytes=hexToBytes(sig.key);
+
+          if(sigBytes && pubBytes){
+            const payloadStr = canonicalSubset(receipt, [
+              'id','issued_at','model_version','policy_version',
+              'input_hash','output_hash','timestamp'
+            ]);
+            const ok = await verifyEd25519(pubBytes, sigBytes, textBytes(payloadStr));
+            signature_ok = (ok===null) ? 'unknown' : ok;
+          }
+        }
+
+        // actualizăm verdictul din UI
+        const el = document.getElementById('resultMessage') || document.getElementById('result');
+        if(el && typeof el.textContent==='string'){
+          const kv = 'signature_ok: ' + String(signature_ok);
+          if(/signature_ok:/i.test(el.textContent)){
+            el.textContent = el.textContent.replace(/signature_ok:\s*\S+/i, kv);
+          }else{
+            el.textContent = el.textContent + '  |  ' + kv;
+          }
+        }
+
+        // persistăm pentru ZIP
+        window.last = window.last || {};
+        window.last.validation = Object.assign(
+          { schema_ok:null, hashes_ok:'unknown', errors:[] },
+          window.last.validation || {},
+          { signature_ok }
+        );
+      }catch(_e){}
+      return res;
+    };
+  }
+})();
+
