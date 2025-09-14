@@ -12,3 +12,8 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helve
 .card:active{transform:scale(.995)}
 .section h2{margin:0 0 12px 0;font-size:18px}
 .footer{margin-top:40px;color:var(--muted);font-size:12px}
+/* match side padding with app.css */
+.container{padding-left:32px;padding-right:32px}
+@media (max-width:760px){
+  .container{padding-left:18px;padding-right:18px}
+}
