@@ -9,7 +9,7 @@
     "output": { "type": "string" },
     "output_hash": {
       "type": "string",
-      "pattern": "^(?i:sha256:)?[0-9a-fA-F]{64}$"
+      "pattern": "^(?:sha256:)?[0-9a-fA-F]{64}$"
     }
   },
   "additionalProperties": true
