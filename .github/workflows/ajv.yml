@@ -1,0 +1,23 @@
+name: ajv
+on: [pull_request]
+jobs:
+  schema-examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: node -e "
+          import fs from 'node:fs/promises';
+          const schema = JSON.parse(await fs.readFile('docs/schema/receipt.schema.json','utf8'));
+          const Ajv = (await import('ajv')).default;
+          const ajv = new Ajv({allErrors:true, strict:false});
+          const validate = ajv.compile(schema);
+          const dir = 'docs/examples';
+          const files = (await fs.readdir(dir)).filter(f=>f.endsWith('.json'));
+          let fail = 0;
+          for (const f of files){
+            const data = JSON.parse(await fs.readFile(`${dir}/${f}`,'utf8'));
+            const ok = validate(data);
+            if(!ok){ console.error('FAIL', f, validate.errors); fail++; }
+          }
+          if (fail) process.exit(1);
+        "
