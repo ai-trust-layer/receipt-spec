@@ -60,7 +60,8 @@ async function makeZip() {
     btn.addEventListener('click', async () => {
       try {
         if (!(fr.files && fr.files[0] && fs.files && fs.files[0])) {
-          out.textContent = 'Select both files first.'; return;
+          out.textContent = 'Select both files first.';
+        document.dispatchEvent(new Event("atl:verify:done")); 
         }
         const [rt, st] = await Promise.all([fr.files[0].text(), fs.files[0].text()]);
         const data   = JSON.parse(rt);
@@ -89,4 +90,35 @@ async function makeZip() {
   } else {
     boot();
   }
+})();
+
+// --- UX guards: enable Verify only when both files are selected; show filenames ---
+(function(){
+  const fr = document.getElementById('fReceipt');
+  const fs = document.getElementById('fSchema');
+  const btn = document.getElementById('btnVerify');
+  const bz  = document.getElementById('btnZip');
+  const out = document.getElementById('resultMessage');
+
+  if (!fr || !fs || !btn) return;
+
+  const $name = (f) => (f && f.name) ? f.name : '—';
+  const showChosen = () => {
+    const rec = fr.files && fr.files[0];
+    const sch = fs.files && fs.files[0];
+    const ok  = !!(rec && sch);
+    btn.disabled = !ok;
+    if (out && (rec || sch)) {
+      out.textContent = `Receipt: ${$name(rec)}  |  Schema: ${$name(sch)}`;
+    }
+  };
+
+  fr.addEventListener('change', showChosen);
+  fs.addEventListener('change', showChosen);
+
+  // initial state on load
+  showChosen();
+
+  // after any successful verify elsewhere in this file, enable ZIP
+  document.addEventListener('atl:verify:done', () => { if (bz) bz.disabled = false; });
 })();
