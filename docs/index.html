@@ -5,36 +5,37 @@
     <title>AI Trust Layer — Receipts</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'self'; style-src 'self'; script-src 'self' 'unsafe-eval'; frame-ancestors 'none'">
+    <link rel="stylesheet" href="css/index.css">
   </head>
-  <body>
-    <header>
+  <body><div class="container">
+    <header class="header">
       <h1>AI Trust Layer — Verifiable Receipts</h1>
       <p>Demo static, offline-first. Alege una din paginile de mai jos.</p>
     </header>
 
     <main>
-      <nav aria-label="Navigație principală">
-        <ul>
-          <li><a href="verify.html">Verify (schema-only)</a></li>
-          <li><a href="audit.html">Audit (ZIP cu checks)</a></li>
-          <li><a href="proof-gallery/">Proof Gallery</a></li>
-          <li><a href="README.md">README</a></li>
-          <li><a href="ANCHORING.md">ANCHORING</a></li>
-        </ul>
+      <nav aria-label="Navigație principală" class="nav">
+        
+          <div class="card"><div><strong>Verify</strong><br><small>Validare Ajv schema-only</small></div><a href="verify.html">Deschide</a></div>
+          <div class="card"><div><strong>Audit</strong><br><small>ZIP cu schema_ok / hashes_ok</small></div><a href="audit.html">Deschide</a></div>
+          <div class="card"><div><strong>Proof Gallery</strong><br><small>Exemple OK / Tampered</small></div><a href="proof-gallery/">Deschide</a></div>
+          <div class="card"><div><strong>README</strong><br><small>Documentație repo</small></div><a href="README.md">Deschide</a></div>
+          <div class="card"><div><strong>ANCHORING</strong><br><small>TxID, DOI, checksum</small></div><a href="ANCHORING.md">Deschide</a></div>
+        
       </nav>
 
-      <section>
+      <section class="section">
         <h2>Ce face fiecare:</h2>
-        <ul>
+        
           <li><strong>Verify</strong>: validează JSON-ul de receipt față de schemă și afișează verdictul.</li>
           <li><strong>Audit</strong>: validează și poate descărca <em>audit pack</em> (.zip) cu <code>schema_ok</code>, <code>hashes_ok</code>, timestamp.</li>
           <li><strong>Proof Gallery</strong>: exemple OK/TAMPERED pentru demo.</li>
-        </ul>
+        
       </section>
     </main>
 
-    <footer>
+    <footer class="footer">
       <small>&copy; AI Trust Layer — build local, fără CDN</small>
     </footer>
-  </body>
+  </div></body>
 </html>
