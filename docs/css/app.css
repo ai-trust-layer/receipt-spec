@@ -1,0 +1,81 @@
+:root{--fg:#0b1320;--muted:#5b677a;--link:#0a58ff;--bg:#f7f9fc;--card:#fff;--bd:#e6ebf2}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--fg);line-height:1.5}
+.container{max-width:920px;margin:48px auto;padding:0 20px}
+h1{margin:0 0 12px 0;font-size:26px}
+.section{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;margin:20px 0}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+label{min-width:80px;color:var(--muted)}
+button{cursor:pointer;border:1px solid var(--bd);background:#fff;border-radius:8px;padding:8px 12px}
+button:disabled{opacity:.5;cursor:not-allowed}
+#resultMessage{margin-top:10px}
+/* ——— layout polish (override-uri la finalul fișierului) ——— */
+.container{max-width:1080px}
+
+.section{padding:20px 22px}
+h1{font-size:28px;margin:0 0 18px}
+
+.row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+
+label{min-width:120px;color:#1f2937;font-weight:600}
+
+/* fișierele să nu împingă layout-ul */
+input[type="file"]{width:380px;max-width:100%}
+
+/* butoane mai „respiro” */
+button{padding:9px 14px;border-radius:10px}
+button+button{margin-left:8px}
+
+/* mesajul de rezultat separat vizual de inputuri */
+#resultMessage{margin-top:12px;font-weight:600}
+
+/* small screens: stivuiește pe o coloană */
+@media (max-width: 760px){
+  .row{flex-direction:column;align-items:flex-start}
+  label{min-width:0}
+  button{width:100%}
+  input[type="file"]{width:100%}
+}
+/* lateral breathing room */
+.container{padding-left:32px;padding-right:32px}
+@media (max-width:760px){
+  .container{padding-left:18px;padding-right:18px}
+}
+body {
+  max-width: 760px;
+  margin: 48px auto 64px;
+  padding: 0 16px;
+}
+/* top breathing room + tidy layout */
+body{padding-top:24px}
+
+.row{display:flex;gap:12px;align-items:center;margin:8px 0}
+label{min-width:120px;display:inline-block}
+
+#resultMessage{margin-top:12px;font-weight:600}
+.page {
+  max-width: 760px;
+  margin: 48px auto 64px;
+  padding: 0 16px;
+}
+.hint { font-size: 14px; opacity: .75; margin-top: 4px; }
+.btn { padding: 8px 14px; border-radius: 10px; border:1px solid rgba(0,0,0,.08); cursor: pointer; }
+.btn:disabled { opacity:.5; cursor:not-allowed; }
+.result-pass { color: #116329; background: #E9F6EE; border:1px solid #CFE8D7; padding:8px 10px; border-radius:8px; }
+.result-fail { color: #7A0A0A; background: #FDECEC; border:1px solid #F6CACA; padding:8px 10px; border-radius:8px; }
+.result-info { color:#334155; background:#EEF2FF; border:1px solid #E0E7FF; padding:8px 10px; border-radius:8px; }
+:focus-visible { outline: 3px solid #94A3B8; outline-offset: 2px; }
+.inputs {
+  padding: 16px;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:12px;
+  background: rgba(0,0,0,.02);
+}
+@media (prefers-color-scheme: dark) {
+  body { background: #0B1220; color: #E5E7EB; }
+  .inputs { background: #0E1626; border-color: #1F2937; }
+  .btn { border-color:#263246; }
+  .result-pass { color:#8FF0B1; background:#0F2A1D; border-color:#184C33; }
+  .result-fail { color:#FCA5A5; background:#2A0F10; border-color:#4B1B1D; }
+  .result-info { color:#BFDBFE; background:#101A33; border-color:#1E3A8A; }
+}
