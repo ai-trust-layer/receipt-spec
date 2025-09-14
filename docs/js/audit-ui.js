@@ -19,7 +19,6 @@ function showResultMessage(result) {
   }
   el.textContent = result.schema_ok ? 'Verdict: PASS (schema_ok=true)' : 'Verdict: FAIL (schema_ok=false)';
   if ("hashes_ok" in result) el.textContent += `  |  hashes_ok: ${result.hashes_ok}`;
-  const bz = document.getElementById('btnZip'); if (bz) bz.disabled = false;
 }
 
 // ZIP
@@ -27,13 +26,11 @@ async function makeZip() {
   const zip = new JSZip();
   zip.file('receipt.json', window.last?.receiptText ?? '');
   zip.file('schema.json',  window.last?.schemaText ?? '');
-  const checksLines = [];
-  checksLines.push(`schema_ok: ${window.last?.validation?.schema_ok ?? 'unknown'}`);
-  if (typeof window.last?.validation?.hashes_ok !== 'undefined') {
-    checksLines.push(`hashes_ok: ${window.last.validation.hashes_ok}`);
-  }
-  checksLines.push(`timestamp: ${new Date().toISOString()}`);
-  const checks = checksLines.join('\n');
+  const checks = [
+    `schema_ok: ${window.last?.validation?.schema_ok ?? false}`,
+    `hashes_ok: ${window.last?.validation?.hashes_ok ?? 'unknown'}`,
+    `timestamp: ${new Date().toISOString()}`
+  ].join('\n');
   zip.file('checks.txt', checks);
   const links = [
     window.last?.validation?.tx_url  ? `Tx: ${window.last.validation.tx_url}`   : '',
@@ -73,7 +70,8 @@ async function makeZip() {
       try {
         if (!(fr.files && fr.files[0] && fs.files && fs.files[0])) {
           out.textContent = 'Select both files first.';
-        document.dispatchEvent(new Event("atl:verify:done")); 
+          document.dispatchEvent(new Event("atl:verify:done")); 
+          return;
         }
         const [rt, st] = await Promise.all([fr.files[0].text(), fs.files[0].text()]);
         const data   = JSON.parse(rt);
@@ -83,8 +81,10 @@ async function makeZip() {
           const rawHash = data && typeof data === 'object' ? data.output_hash : undefined;
           // normalize forms like "sha256:<hex>" or plain hex
           const expect = rawHash ? String(rawHash).replace(/^sha256:/i, '').toLowerCase() : undefined;
-          if (expect && data && typeof data.output === 'string') {
-            const calc = (await sha256Hex(data.output)).toLowerCase();
+          // normalizează și când output nu e string pur (ex. obiect/array):
+          const outputStr = typeof data.output === 'string' ? data.output : (data.output ? JSON.stringify(data.output) : null);
+          if (expect && outputStr) {
+            const calc = (await sha256Hex(outputStr)).toLowerCase();
             hashes_ok = (calc === expect);
           }
           // if `output` is missing, keep 'unknown'
@@ -94,22 +94,22 @@ async function makeZip() {
         const schema = JSON.parse(st);
 
         const ajv = new window.Ajv7({ allErrors:true, strict:false });
-        if (typeof window.addAjvFormats === 'function') window.addAjvFormats(ajv);
+        try { if (typeof window.addAjvFormats === 'function') window.addAjvFormats(ajv); } catch {}
 
         const validate = ajv.compile(schema);
         const ok = validate(data);
         window.last = window.last || {};
+        window.last.receiptText = rt;
+        window.last.schemaText = st;
         window.last.validation = {
           schema_ok: ok,
           hashes_ok: hashes_ok,
           errors: validate.errors || []
         };
-        window.last.receiptText = rt;
-        window.last.schemaText = st;
         out.textContent = ok ? 'Verdict: PASS (schema_ok=true)' : 'Verdict: FAIL (schema_ok=false)';
         out.textContent += `  |  hashes_ok: ${hashes_ok}`;
 
-        const bz = document.getElementById('btnZip'); if (bz) bz.disabled = false;
+        document.dispatchEvent(new Event("atl:verify:done"));
       } catch (e) {
         console.error('verify error:', e);
         out.textContent = 'Verdict: FAIL (unexpected_error)';
@@ -133,6 +133,9 @@ async function makeZip() {
 
   if (!fr || !fs || !btn) return;
 
+  // Keep ZIP button disabled by default
+  if (bz) bz.disabled = true;
+
   const $name = (f) => (f && f.name) ? f.name : '—';
   const showChosen = () => {
     const rec = fr.files && fr.files[0];
@@ -150,6 +153,8 @@ async function makeZip() {
   // initial state on load
   showChosen();
 
-  // after any successful verify elsewhere in this file, enable ZIP
-  document.addEventListener('atl:verify:done', () => { if (bz) bz.disabled = false; });
+  // Enable ZIP only after successful verify (when window.last.validation exists)
+  document.addEventListener('atl:verify:done', () => { 
+    if (bz && window.last?.validation) bz.disabled = false; 
+  });
 })();
