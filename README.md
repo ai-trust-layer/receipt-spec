@@ -18,7 +18,7 @@ Live Proof Gallery: https://ai-trust-layer.github.io/proof-gallery/
 
 ## Live Verify UI
 
-- https://ai-trust-layer.github.io/receipt-spec/docs/verify.html
+- https://ai-trust-layer.github.io/receipt-spec/verify.html
 
 ## Security & Compliance Pack
 
