@@ -91,7 +91,7 @@ function showResultMessage(result) {
   el.textContent = result.schema_ok ? 'Verdict: PASS (schema_ok=true)' : 'Verdict: FAIL (schema_ok=false)';
   if ("hashes_ok" in result) el.textContent += `  |  hashes_ok: ${result.hashes_ok}`;
   if ("signature_ok" in result) el.textContent += `  |  signature_ok: ${result.signature_ok}`;
-  const bz = document.getElementById('btnZip'); if (bz) bz.disabled = false;
+  const bz = document.getElementById('btnDownloadZip'); if (bz) bz.disabled = false;
 }
 
 // ZIP
@@ -127,25 +127,18 @@ async function makeZip() {
     window.last?.validation?.doi_url ? `DOI: ${window.last.validation.doi_url}` : ''
   ].filter(Boolean).join('\n') || 'no-links';
   zip.file('links.txt', links);
-  const blob = await zip.generateAsync({type:'blob'});
+  const blob = await zip.generateAsync({ type: 'blob' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'audit-pack.zip';
+  a.download = 'audit.zip';
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(a.href);
+  setTimeout(() => {
+    URL.revokeObjectURL(a.href);
+    a.remove();
+  }, 0);
 }
 
-// wire ZIP o singură dată
-(function wireZip(){
-  const btn = document.getElementById('btnZip');
-  if (btn && !btn._wired) {
-    btn.addEventListener('click', async () => {
-      if (!window.last?.receiptText || !window.last?.schemaText || !window.last?.validation) { alert('Run Verify first'); return; }
-      await makeZip();
-    });
-    btn._wired = true;
-  }
-})();
 
 // --- bootstrap: robust Verify wiring (schema-only) ---
 (function(){
@@ -208,12 +201,30 @@ async function makeZip() {
         out.textContent += `  |  hashes_ok: ${hashes_ok}`;
         out.textContent += `  |  signature_ok: ${signature_ok}`;
 
-        const bz = document.getElementById('btnZip'); if (bz) bz.disabled = false;
+        const bz = document.getElementById('btnDownloadZip'); if (bz) bz.disabled = false;
       } catch (e) {
         console.error('verify error:', e);
         out.textContent = 'Verdict: FAIL (unexpected_error)';
       }
     });
+
+    // Download button wiring
+    const btnZip = document.getElementById('btnDownloadZip');
+    if (btnZip && !btnZip.dataset.wired) {
+      btnZip.disabled = true;
+      btnZip.addEventListener('click', async (e) => {
+        e.preventDefault();
+        btnZip.disabled = true;
+        try {
+          await makeZip();
+        } catch (err) {
+          console.error('zip error', err);
+        } finally {
+          btnZip.disabled = false;
+        }
+      });
+      btnZip.dataset.wired = '1';
+    }
   };
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
@@ -227,7 +238,7 @@ async function makeZip() {
   const fr = document.getElementById('fReceipt');
   const fs = document.getElementById('fSchema');
   const btn = document.getElementById('btnVerify');
-  const bz  = document.getElementById('btnZip');
+  const bz  = document.getElementById('btnDownloadZip');
   const out = document.getElementById('resultMessage');
 
   if (!fr || !fs || !btn) return;
