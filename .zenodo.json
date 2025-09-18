@@ -1,0 +1,10 @@
+{
+  "title": "AI Trust Layer — Verifiable Receipts",
+  "upload_type": "software",
+  "license": "MIT",
+  "creators": [
+    {"name": "imdaniel221"}
+  ],
+  "description": "Spec si unelte offline pentru verificarea chitantelor AI (schema 2020-12, Ajv2020, Ed25519).",
+  "keywords": ["verifiable receipts", "Ajv2020", "Ed25519"]
+}
