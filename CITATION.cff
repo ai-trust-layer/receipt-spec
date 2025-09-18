@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: Va rugam citati acest proiect daca il folositi.
+title: AI Trust Layer — Verifiable Receipts
+authors:
+  - name: imdaniel221
+version: 0.1.0
+date-released: 2025-09-18
+repository-code: https://github.com/ai-trust-layer/receipt-spec
+type: software
+keywords:
+  - verifiable receipts
+  - Ajv2020
+  - Ed25519

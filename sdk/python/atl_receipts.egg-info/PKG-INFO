@@ -1,0 +1,20 @@
+Metadata-Version: 2.4
+Name: atl-receipts
+Version: 0.1.0
+Summary: AI Trust Layer - Receipt verifier (Python SDK, offline)
+Author: AI Trust Layer
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: jsonschema>=4.20.0
+Requires-Dist: PyNaCl>=1.5.0
+Requires-Dist: click>=8.1
+
+Instalare (local, dev):
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -U pip build
+python -m build sdk/python
+pip install sdk/python/dist/*.whl
+
+CLI:
+atl-receipts --schema docs/schema/receipt.schema.json --receipt docs/examples/ok-1.json
