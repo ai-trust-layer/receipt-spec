@@ -96,6 +96,15 @@ async function makeZip() {
   const zip = new JSZip();
   zip.file('receipt.json', window.last?.receiptText ?? '');
   zip.file('schema.json',  window.last?.schemaText ?? '');
+  
+  // Parse receipt data for timestamp
+  let data = null;
+  try {
+    data = JSON.parse(window.last?.receiptText || '{}');
+  } catch (e) {
+    data = {};
+  }
+  
   const ts = (data && data.timestamp) ? String(data.timestamp)
              : (data && data.issued_at) ? String(data.issued_at)
              : "n/a";
