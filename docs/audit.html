@@ -5,10 +5,12 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'self'; style-src 'self'; script-src 'self' 'unsafe-eval'; frame-ancestors 'none'">
 <title>AI Trust Receipt — Audit Pack</title>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<!-- Ajv (draft-07) + formats -->
+<!-- Ajv (draft-2020-12) + formats -->
 <!-- JSZip for ZIP creation -->
   <script src="./vendor/ajv-bundle.js"></script>
   <script src="./vendor/jszip-bundle.js"></script>
+  <script src="./js/signature-verify.js"></script>
+  <script src="./js/audit-ui.js"></script>
   <link rel="stylesheet" href="./css/audit.css">
 </head>
 <body>

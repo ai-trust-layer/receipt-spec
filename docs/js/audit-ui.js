@@ -96,12 +96,17 @@ async function makeZip() {
   const zip = new JSZip();
   zip.file('receipt.json', window.last?.receiptText ?? '');
   zip.file('schema.json',  window.last?.schemaText ?? '');
+  const ts = (data && data.timestamp) ? String(data.timestamp)
+             : (data && data.issued_at) ? String(data.issued_at)
+             : "n/a";
+  const v = (window.last && window.last.validation) ? window.last.validation : {};
   const checks = [
-    `schema_ok: ${window.last?.validation?.schema_ok ?? false}`,
-    `hashes_ok: ${window.last?.validation?.hashes_ok ?? 'unknown'}`,
-    `signature_ok: ${window.last?.validation?.signature_ok ?? 'unknown'}`,
-    `timestamp: ${new Date().toISOString()}`
-  ].join('\n');
+    "schema_ok: " + String(!!v.schema_ok),
+    "hashes_ok: " + String(!!v.hashes_ok),
+    "signature_ok: " + String(v.signature_ok === true),
+    "format: v1.1",
+    "timestamp: " + ts
+  ].join("\n");
   zip.file('checks.txt', checks);
   const links = [
     window.last?.validation?.tx_url  ? `Tx: ${window.last.validation.tx_url}`   : '',
@@ -161,38 +166,18 @@ async function makeZip() {
         }
         
         // --- Ed25519 signature check ---
-        let signature_ok = 'unknown';
+        let signature_ok = false;
         try {
-          const sig = data && typeof data === 'object' ? data.signature : undefined;
-          if (sig && typeof sig === 'object' && sig.alg === 'Ed25519' && sig.value && sig.key) {
-            // Decode public key and signature
-            const keyFmt = detectFmt(sig.key);
-            const sigFmt = detectFmt(sig.value);
-            if (keyFmt && sigFmt) {
-              const pubBytes = keyFmt === 'b64u' ? b64uToBytes(sig.key) : hexToBytes(sig.key);
-              const sigBytes = sigFmt === 'b64u' ? b64uToBytes(sig.value) : hexToBytes(sig.value);
-              
-              // Build canonical payload
-              const payloadStr = canonicalSubset(data, ['id', 'issued_at', 'model_version', 'policy_version', 'input_hash', 'output_hash', 'timestamp']);
-              const msgBytes = textToBytes(payloadStr);
-              
-              // Verify signature
-              const result = await verifyEd25519(pubBytes, sigBytes, msgBytes);
-              if (result !== null) {
-                signature_ok = result;
-              }
-              // if result is null, keep 'unknown'
-            }
-            // if decode fails, keep 'unknown'
+          if (typeof window.verifySignatureEd25519 === "function") {
+            signature_ok = await window.verifySignatureEd25519(data);
           }
-          // if signature missing or malformed, keep 'unknown'
-        } catch (_e) {
-          signature_ok = false; // fail-safe on unexpected error
+        } catch (e) {
+          signature_ok = false;
         }
         const schema = JSON.parse(st);
 
-        const ajv = new window.Ajv7({ allErrors:true, strict:false });
-        if (typeof window.addAjvFormats === 'function') window.addAjvFormats(ajv);
+        const ajv = new Ajv2020({ strict: true, allErrors: true });
+        if (typeof window.ajvFormats === 'function') { window.ajvFormats(ajv); }
 
         const validate = ajv.compile(schema);
         const ok = validate(data);
@@ -203,6 +188,7 @@ async function makeZip() {
           signature_ok: signature_ok,
           errors: validate.errors || []
         };
+        verdict.signature_ok = signature_ok;
         window.last.receiptText = rt;
         window.last.schemaText = st;
         out.textContent = ok ? 'Verdict: PASS (schema_ok=true)' : 'Verdict: FAIL (schema_ok=false)';
