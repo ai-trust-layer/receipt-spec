@@ -1,3 +1,6 @@
+// Initialize window.last safely
+window.last = window.last || {};
+
 // Minimal SHA-256 hex helper
 async function sha256Hex(str) {
   const enc = new TextEncoder().encode(str);
@@ -97,18 +100,19 @@ async function makeZip() {
   zip.file('receipt.json', window.last?.receiptText ?? '');
   zip.file('schema.json',  window.last?.schemaText ?? '');
   
-  // Parse receipt data for timestamp
-  let data = null;
+  let data;
   try {
     data = JSON.parse(window.last?.receiptText || '{}');
-  } catch (e) {
+  } catch (_) {
     data = {};
   }
-  
-  const ts = (data && data.timestamp) ? String(data.timestamp)
-             : (data && data.issued_at) ? String(data.issued_at)
-             : "n/a";
+
   const v = (window.last && window.last.validation) ? window.last.validation : {};
+
+  const ts = (data && data.timestamp) ? String(data.timestamp)
+         : (data && data.issued_at) ? String(data.issued_at)
+         : "n/a";
+
   const checks = [
     "schema_ok: " + String(!!v.schema_ok),
     "hashes_ok: " + String(!!v.hashes_ok),
@@ -116,6 +120,7 @@ async function makeZip() {
     "format: v1.1",
     "timestamp: " + ts
   ].join("\n");
+
   zip.file('checks.txt', checks);
   const links = [
     window.last?.validation?.tx_url  ? `Tx: ${window.last.validation.tx_url}`   : '',
@@ -197,7 +202,6 @@ async function makeZip() {
           signature_ok: signature_ok,
           errors: validate.errors || []
         };
-        verdict.signature_ok = signature_ok;
         window.last.receiptText = rt;
         window.last.schemaText = st;
         out.textContent = ok ? 'Verdict: PASS (schema_ok=true)' : 'Verdict: FAIL (schema_ok=false)';
