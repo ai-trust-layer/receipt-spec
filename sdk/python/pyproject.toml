@@ -1,0 +1,6 @@
+
+[tool.setuptools]
+license-files = ["sdk/python/LICENSE"]
+
+[project]
+license = { text = "BUSL-1.1 until 2027-01-01; then Apache-2.0" }
