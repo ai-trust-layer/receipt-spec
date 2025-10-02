@@ -1,0 +1,2 @@
+[console_scripts]
+atl-receipts = atl_receipts.cli:main
