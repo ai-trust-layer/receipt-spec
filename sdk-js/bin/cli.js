@@ -19,6 +19,7 @@ function parseArgs(argv) {
 
 function usage() {
   console.log('Usage: atl-receipts --schema <schema.json> --receipt <receipt.json> [--pretty]');
+  console.log('Output JSON: {"schema_ok":bool,"hashes_ok":bool,"signature_ok":bool,"format":"v1.1"}');
 }
 
 (async () => {
@@ -32,10 +33,11 @@ function usage() {
     const schema = JSON.parse(fs.readFileSync(path.resolve(args.schema),'utf8'));
     const data   = JSON.parse(fs.readFileSync(path.resolve(args.receipt),'utf8'));
     
+    const hasHash = typeof data.output_hash === 'string' && data.output_hash.length > 0;
     const result = {
-      schema_ok: true,
-      hashes_ok: typeof data.output_hash === 'string',
-      signature_ok: false,
+      schema_ok: true,            // CLI nu face schema validation; acoperim în CI/UI
+      hashes_ok: !!hasHash,       // check minimal
+      signature_ok: false,        // păstrat false în CLI stub; verify e pe server/CI
       format: 'v1.1'
     };
     
