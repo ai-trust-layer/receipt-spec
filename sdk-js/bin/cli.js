@@ -1,7 +1,6 @@
-SPDX-License-Identifier: Apache-2.0
-Copyright (c) 2025 AI Trust Layer
-
 #!/usr/bin/env node
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2025 AI Trust Layer
 import fs from 'fs';
 import path from 'path';
 
