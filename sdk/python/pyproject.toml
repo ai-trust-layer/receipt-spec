@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "build"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "atl-receipts"
+version = "0.1.0"
+description = "AI Trust Layer — Verifiable receipts (schema 2020-12, deterministic hashes, Ed25519) — offline"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "Apache-2.0"
+authors = [{ name = "AI Trust Layer" }]
+dependencies = [
+  "jsonschema>=4.21",
+  "pynacl>=1.5",
+  "click>=8.1"
+]
+
+license-files = ["LICENSE"]
+[project.urls]
+Homepage = "https://github.com/ai-trust-layer/receipt-spec"
+
+[project.scripts]
+atl-receipts = "atl_receipts.cli:main"
+
+[tool.setuptools]
+zip-safe = true
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["atl_receipts*"]
+[tool.setuptools.package-data]
+atl_receipts = ["py.typed"]

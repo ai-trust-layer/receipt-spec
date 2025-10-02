@@ -1,28 +1,21 @@
-
-tools/anchor/.env
-tools/anchor/.env
-node_modules/
-.env
-
-# local-only
+.venv/
+__pycache__/
+*.pyc
 .DS_Store
-receipt.json
-tools/
 
-# local backups
-*.bak
+node_modules/
+
+sdk/python/dist/
+sdk/python/*.egg-info/
+sdk/python/atl_receipts/__pycache__/
+
+docs/*.bak
+docs/js/*.bak*
+docs/vendor/*.bak
+docs/.DS_Store
+
 proof-gallery/*.backup.json
 
-# build artifacts / legacy
-scripts/
-docs/js/verify-ui.mjs
-docs/vendor/jszip-entry.js
-
-# build artifacts / legacy
-scripts/
-docs/js/verify-ui.mjs
-docs/vendor/jszip-entry.js
-docs/css/audit.css
-
-# local backups
-*.bak*
+receipt.json
+sdk/python/dist/
+sdk/python/*.egg-info/
