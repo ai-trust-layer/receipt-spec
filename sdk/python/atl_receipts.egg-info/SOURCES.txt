@@ -1,0 +1,14 @@
+LICENSE
+README.md
+pyproject.toml
+atl_receipts/__init__.py
+atl_receipts/canonical.py
+atl_receipts/cli.py
+atl_receipts/verify.py
+atl_receipts.egg-info/PKG-INFO
+atl_receipts.egg-info/SOURCES.txt
+atl_receipts.egg-info/dependency_links.txt
+atl_receipts.egg-info/entry_points.txt
+atl_receipts.egg-info/requires.txt
+atl_receipts.egg-info/top_level.txt
+atl_receipts.egg-info/zip-safe

@@ -1,3 +1,6 @@
+SPDX-License-Identifier: Apache-2.0
+Copyright (c) 2025 AI Trust Layer
+
 function ensureMsgHost() {
   let el = document.getElementById('resultMessage');
   if (!el) {

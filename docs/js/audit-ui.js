@@ -1,3 +1,9 @@
+SPDX-License-Identifier: Apache-2.0
+Copyright (c) 2025 AI Trust Layer
+
+// Initialize window.last safely
+window.last = window.last || {};
+
 // Minimal SHA-256 hex helper
 async function sha256Hex(str) {
   const enc = new TextEncoder().encode(str);
@@ -88,7 +94,7 @@ function showResultMessage(result) {
   el.textContent = result.schema_ok ? 'Verdict: PASS (schema_ok=true)' : 'Verdict: FAIL (schema_ok=false)';
   if ("hashes_ok" in result) el.textContent += `  |  hashes_ok: ${result.hashes_ok}`;
   if ("signature_ok" in result) el.textContent += `  |  signature_ok: ${result.signature_ok}`;
-  const bz = document.getElementById('btnZip'); if (bz) bz.disabled = false;
+  const bz = document.getElementById('btnDownloadZip'); if (bz) bz.disabled = false;
 }
 
 // ZIP
@@ -96,37 +102,46 @@ async function makeZip() {
   const zip = new JSZip();
   zip.file('receipt.json', window.last?.receiptText ?? '');
   zip.file('schema.json',  window.last?.schemaText ?? '');
+  
+  let data;
+  try {
+    data = JSON.parse(window.last?.receiptText || '{}');
+  } catch (_) {
+    data = {};
+  }
+
+  const v = (window.last && window.last.validation) ? window.last.validation : {};
+
+  const ts = (data && data.timestamp) ? String(data.timestamp)
+         : (data && data.issued_at) ? String(data.issued_at)
+         : "n/a";
+
   const checks = [
-    `schema_ok: ${window.last?.validation?.schema_ok ?? false}`,
-    `hashes_ok: ${window.last?.validation?.hashes_ok ?? 'unknown'}`,
-    `signature_ok: ${window.last?.validation?.signature_ok ?? 'unknown'}`,
-    `timestamp: ${new Date().toISOString()}`
-  ].join('\n');
+    "schema_ok: " + String(!!v.schema_ok),
+    "hashes_ok: " + String(!!v.hashes_ok),
+    "signature_ok: " + String(v.signature_ok === true),
+    "format: v1.1",
+    "timestamp: " + ts
+  ].join("\n");
+
   zip.file('checks.txt', checks);
   const links = [
     window.last?.validation?.tx_url  ? `Tx: ${window.last.validation.tx_url}`   : '',
     window.last?.validation?.doi_url ? `DOI: ${window.last.validation.doi_url}` : ''
   ].filter(Boolean).join('\n') || 'no-links';
   zip.file('links.txt', links);
-  const blob = await zip.generateAsync({type:'blob'});
+  const blob = await zip.generateAsync({ type: 'blob' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'audit-pack.zip';
+  a.download = 'audit.zip';
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(a.href);
+  setTimeout(() => {
+    URL.revokeObjectURL(a.href);
+    a.remove();
+  }, 0);
 }
 
-// wire ZIP o singură dată
-(function wireZip(){
-  const btn = document.getElementById('btnZip');
-  if (btn && !btn._wired) {
-    btn.addEventListener('click', async () => {
-      if (!window.last?.receiptText || !window.last?.schemaText || !window.last?.validation) { alert('Run Verify first'); return; }
-      await makeZip();
-    });
-    btn._wired = true;
-  }
-})();
 
 // --- bootstrap: robust Verify wiring (schema-only) ---
 (function(){
@@ -161,38 +176,18 @@ async function makeZip() {
         }
         
         // --- Ed25519 signature check ---
-        let signature_ok = 'unknown';
+        let signature_ok = false;
         try {
-          const sig = data && typeof data === 'object' ? data.signature : undefined;
-          if (sig && typeof sig === 'object' && sig.alg === 'Ed25519' && sig.value && sig.key) {
-            // Decode public key and signature
-            const keyFmt = detectFmt(sig.key);
-            const sigFmt = detectFmt(sig.value);
-            if (keyFmt && sigFmt) {
-              const pubBytes = keyFmt === 'b64u' ? b64uToBytes(sig.key) : hexToBytes(sig.key);
-              const sigBytes = sigFmt === 'b64u' ? b64uToBytes(sig.value) : hexToBytes(sig.value);
-              
-              // Build canonical payload
-              const payloadStr = canonicalSubset(data, ['id', 'issued_at', 'model_version', 'policy_version', 'input_hash', 'output_hash', 'timestamp']);
-              const msgBytes = textToBytes(payloadStr);
-              
-              // Verify signature
-              const result = await verifyEd25519(pubBytes, sigBytes, msgBytes);
-              if (result !== null) {
-                signature_ok = result;
-              }
-              // if result is null, keep 'unknown'
-            }
-            // if decode fails, keep 'unknown'
+          if (typeof window.verifySignatureEd25519 === "function") {
+            signature_ok = await window.verifySignatureEd25519(data);
           }
-          // if signature missing or malformed, keep 'unknown'
-        } catch (_e) {
-          signature_ok = false; // fail-safe on unexpected error
+        } catch (e) {
+          signature_ok = false;
         }
         const schema = JSON.parse(st);
 
-        const ajv = new window.Ajv7({ allErrors:true, strict:false });
-        if (typeof window.addAjvFormats === 'function') window.addAjvFormats(ajv);
+        const ajv = new Ajv2020({ strict: true, allErrors: true });
+        if (typeof window.ajvFormats === 'function') { window.ajvFormats(ajv); }
 
         const validate = ajv.compile(schema);
         const ok = validate(data);
@@ -209,12 +204,30 @@ async function makeZip() {
         out.textContent += `  |  hashes_ok: ${hashes_ok}`;
         out.textContent += `  |  signature_ok: ${signature_ok}`;
 
-        const bz = document.getElementById('btnZip'); if (bz) bz.disabled = false;
+        const bz = document.getElementById('btnDownloadZip'); if (bz) bz.disabled = false;
       } catch (e) {
         console.error('verify error:', e);
         out.textContent = 'Verdict: FAIL (unexpected_error)';
       }
     });
+
+    // Download button wiring
+    const btnZip = document.getElementById('btnDownloadZip');
+    if (btnZip && !btnZip.dataset.wired) {
+      btnZip.disabled = true;
+      btnZip.addEventListener('click', async (e) => {
+        e.preventDefault();
+        btnZip.disabled = true;
+        try {
+          await makeZip();
+        } catch (err) {
+          console.error('zip error', err);
+        } finally {
+          btnZip.disabled = false;
+        }
+      });
+      btnZip.dataset.wired = '1';
+    }
   };
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
@@ -228,7 +241,7 @@ async function makeZip() {
   const fr = document.getElementById('fReceipt');
   const fs = document.getElementById('fSchema');
   const btn = document.getElementById('btnVerify');
-  const bz  = document.getElementById('btnZip');
+  const bz  = document.getElementById('btnDownloadZip');
   const out = document.getElementById('resultMessage');
 
   if (!fr || !fs || !btn) return;
