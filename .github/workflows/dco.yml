@@ -1,0 +1,23 @@
+name: DCO Check
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  dco-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: DCO Check
+        uses: dco-check/dco-check@v1.0.0
+        with:
+          path: '.'
+          exclude: ''
+          message: 'All commits must be signed with a DCO signature. Please add "Signed-off-by: Your Name <your.email@example.com>" to your commit message.'
