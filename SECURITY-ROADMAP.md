@@ -15,3 +15,5 @@ Scope: hardening pentru proiectul AI Trust Layer (spec + SDK + interop).
 - Atestate TEE (SGX/Nitro) pentru anchoring service
 - Rotire chei și HSM/KMS pentru semnarea release-urilor
 - SOC 2 Type I, pregătire pentru Type II
+
+Minor: clarify ignore hardening.
