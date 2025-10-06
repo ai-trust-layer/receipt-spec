@@ -26,3 +26,4 @@ docs/css/audit.css
 
 # local backups
 *.bak*
+ATL_CONTEXT.private.json
