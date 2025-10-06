@@ -1,0 +1,9 @@
+node_modules
+.venv
+dist
+build
+sdk/python/dist
+sdk/python/*.egg-info
+.DS_Store
+ATL_CONTEXT.private.json
+.env
